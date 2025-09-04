@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import json
 import math
 import time
@@ -134,6 +134,47 @@ calculator = MersenneCalculator()
 def index():
     """Serve the main interactive webpage"""
     return render_template('index.html')
+
+# --- Image gallery endpoints ---
+KNOWN_IMAGE_DIRS = [
+    ".",
+    "all perfectno about",
+    "finder_new_mersenne prim",
+]
+
+ALLOWED_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+
+
+def collect_images():
+    images = []
+    for base in KNOWN_IMAGE_DIRS:
+        if not os.path.isdir(base):
+            continue
+        for root, _, files in os.walk(base):
+            for f in files:
+                ext = os.path.splitext(f)[1].lower()
+                if ext in ALLOWED_EXT:
+                    rel_root = os.path.relpath(root, start=os.getcwd())
+                    images.append({
+                        "name": f,
+                        "path": os.path.join(rel_root, f).replace("\\", "/")
+                    })
+    return images
+
+@app.route('/api/images')
+def list_images():
+    return jsonify({"images": collect_images()})
+
+@app.route('/images/<path:filename>')
+def serve_image(filename):
+    # Securely serve from repo root only
+    directory = os.getcwd()
+    # Prevent path traversal
+    safe_path = os.path.normpath(os.path.join(directory, filename))
+    if not safe_path.startswith(directory):
+        return jsonify({"error": "Invalid path"}), 400
+    folder, file = os.path.split(safe_path)
+    return send_from_directory(folder, file)
 
 @app.route('/api/test_mersenne', methods=['POST'])
 def test_mersenne():

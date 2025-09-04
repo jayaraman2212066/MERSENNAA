@@ -302,6 +302,14 @@
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        .gallery-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; }
+        .gallery-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,.25); }
+        .gallery-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+        .gallery-card .caption { padding: 10px 12px; font-size: .95rem; color: #b8c6db; word-break: break-word; }
+        .gallery-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+        .gallery-search { padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.25); color: #fff; min-width: 260px; }
     </style>
 </head>
 <body>
@@ -319,7 +327,7 @@
             <button class="nav-btn" onclick="showSection('technical')">Technical Skills</button>
             <button class="nav-btn" onclick="showSection('demo')">Live Demo</button>
             <button class="nav-btn" onclick="showSection('achievements')">Achievements</button>
-            <button class="nav-btn" onclick="showSection('showcase')">Project Showcase</button>
+            <button class="nav-btn" onclick="openGallery()">Gallery</button>
         </div>
 
         <!-- Overview Section -->
@@ -469,47 +477,16 @@
             </div>
         </div>
 
-        <!-- Project Showcase Section -->
-        <div id="showcase" class="content-section">
+        <!-- Gallery Section -->
+        <div id="gallery" class="content-section">
             <div class="section">
-                <h2>🎯 Why This Project Stands Out</h2>
-                
-                <h3>For HR Teams:</h3>
-                <ol>
-                    <li><strong>Intellectual Curiosity</strong> - Self-motivated learning beyond academic requirements</li>
-                    <li><strong>Technical Depth</strong> - Mastery of multiple programming languages and paradigms</li>
-                    <li><strong>Problem-Solving</strong> - Tackling one of mathematics' most challenging problems</li>
-                    <li><strong>Persistence</strong> - Long-term project commitment and completion</li>
-                    <li><strong>Innovation</strong> - Creating novel solutions to complex computational challenges</li>
-                </ol>
-
-                <h3>For Technical Teams:</h3>
-                <ol>
-                    <li><strong>Algorithm Design</strong> - Understanding of computational complexity</li>
-                    <li><strong>Performance Engineering</strong> - Focus on optimization and efficiency</li>
-                    <li><strong>Mathematical Programming</strong> - Ability to translate theory into code</li>
-                    <li><strong>System Architecture</strong> - Well-organized, maintainable codebase</li>
-                    <li><strong>Cross-Platform Development</strong> - Windows batch scripting and cross-compilation</li>
-                </ol>
-            </div>
-
-            <div class="section">
-                <h2>💡 What This Demonstrates About You</h2>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h4>Technical Competence</h4>
-                        <p>Advanced programming skills across multiple languages, deep understanding of algorithms and data structures</p>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Problem-Solving Ability</h4>
-                        <p>Tackling open mathematical problems, creating efficient solutions to computational challenges</p>
-                    </div>
-                    <div class="stat-card">
-                        <h4>Professional Qualities</h4>
-                        <p>Self-motivation, intellectual curiosity, long-term project commitment, attention to detail</p>
-                    </div>
+                <h2>🖼️ Image Gallery</h2>
+                <div class="gallery-toolbar">
+                    <input id="gallery-filter" class="gallery-search" placeholder="Filter by filename..." oninput="filterGallery()" />
+                    <button class="demo-btn" onclick="reloadGallery()">Reload</button>
                 </div>
+                <div id="gallery-grid" class="gallery-grid"></div>
+                <div id="gallery-empty" class="demo-output" style="display:none;">No images found.</div>
             </div>
         </div>
 
@@ -530,16 +507,14 @@
             document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            event.target.classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
         }
+
+        function openGallery(){ showSection('gallery'); reloadGallery(); }
 
         // API helpers
         async function postJSON(url = '', data = {}) {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             return res.json();
         }
 
@@ -604,6 +579,49 @@
         // Typing effect
         function typeWriter(element, text, speed = 100) { let i = 0; element.innerHTML = ''; (function type(){ if (i < text.length) { element.innerHTML += text.charAt(i++); setTimeout(type, speed);} })(); }
         window.addEventListener('load', () => { const subtitle = document.querySelector('.header p:last-child'); typeWriter(subtitle, 'This project represents my attempt to understand and explore that language through code.', 50); });
+
+        // Gallery logic
+        let __galleryItems = [];
+        async function reloadGallery(){
+            const grid = document.getElementById('gallery-grid');
+            const empty = document.getElementById('gallery-empty');
+            grid.innerHTML = '';
+            empty.style.display = 'none';
+            try{
+                const res = await fetch('/api/images');
+                const data = await res.json();
+                __galleryItems = (data.images || []).sort((a,b)=>a.name.localeCompare(b.name));
+                renderGallery(__galleryItems);
+                if(!__galleryItems.length){ empty.style.display='block'; }
+            }catch(e){
+                empty.style.display='block';
+                empty.innerText = 'Failed to load images';
+            }
+        }
+
+        function renderGallery(items){
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'gallery-card';
+                const img = document.createElement('img');
+                img.loading = 'lazy';
+                img.src = '/images/' + item.path;
+                img.alt = item.name;
+                const cap = document.createElement('div');
+                cap.className = 'caption';
+                cap.textContent = item.path;
+                card.appendChild(img); card.appendChild(cap);
+                grid.appendChild(card);
+            });
+        }
+
+        function filterGallery(){
+            const q = (document.getElementById('gallery-filter').value || '').toLowerCase();
+            const filtered = __galleryItems.filter(it => it.name.toLowerCase().includes(q) || it.path.toLowerCase().includes(q));
+            renderGallery(filtered);
+        }
     </script>
 </body>
 </html>
