@@ -48,32 +48,34 @@ class MersenneCalculator:
                 return False
         return True
     
-    def lucas_lehmer_test(self, p):
-        """Lucas-Lehmer primality test for Mersenne numbers"""
+    def lucas_lehmer_test(self, p: int, time_budget_seconds: float | None = None):
+        """Lucas-Lehmer primality test for Mersenne numbers with optional time budget.
+        Returns True/False, or raises TimeoutError if budget exceeded.
+        """
         if p == 2:
             return True
-        
+        start = time.time()
         s = 4
         M = (1 << p) - 1  # 2^p - 1
-        
         for _ in range(p - 2):
             s = (s * s - 2) % M
-        
+            if time_budget_seconds is not None and (time.time() - start) > time_budget_seconds:
+                raise TimeoutError("Lucas-Lehmer timed out")
         return s == 0
     
-    def test_mersenne_number(self, p):
+    def test_mersenne_number(self, p, time_budget_seconds: float | None = 8.0):
         """Test if 2^p - 1 is prime"""
         start_time = time.time()
         
         if p <= 0:
             return {"valid": False, "error": "Exponent must be positive"}
         
-        if p > 1000:  # Limit for demo purposes
-            return {"valid": False, "error": "Exponent too large for demo (max 1000)"}
+        if p > 5000:  # Limit for demo purposes
+            return {"valid": False, "error": "Exponent too large for demo (max 5000)"}
         
         try:
             M = (1 << p) - 1
-            is_prime = self.lucas_lehmer_test(p)
+            is_prime = self.lucas_lehmer_test(p, time_budget_seconds=time_budget_seconds)
             end_time = time.time()
             
             return {
@@ -84,6 +86,8 @@ class MersenneCalculator:
                 "computation_time": round(end_time - start_time, 4),
                 "digits": len(str(M))
             }
+        except TimeoutError:
+            return {"valid": False, "error": "Computation timed out — try a smaller exponent"}
         except Exception as e:
             return {"valid": False, "error": str(e)}
     
