@@ -137,28 +137,35 @@ def index():
 
 # --- Image gallery endpoints ---
 KNOWN_IMAGE_DIRS = [
-    ".",
     "all perfectno about",
     "finder_new_mersenne prim",
+    ".",
 ]
 
 ALLOWED_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+SKIP_DIR_NAMES = {".git", "venv", ".venv", "node_modules", "__pycache__", "site-packages", "dist", "build"}
 
 
 def collect_images():
+    seen = set()
     images = []
+    cwd = os.getcwd()
     for base in KNOWN_IMAGE_DIRS:
         if not os.path.isdir(base):
             continue
-        for root, _, files in os.walk(base):
+        for root, dirs, files in os.walk(base):
+            # prune unwanted directories in-place
+            dirs[:] = [d for d in dirs if d not in SKIP_DIR_NAMES]
             for f in files:
                 ext = os.path.splitext(f)[1].lower()
-                if ext in ALLOWED_EXT:
-                    rel_root = os.path.relpath(root, start=os.getcwd())
-                    images.append({
-                        "name": f,
-                        "path": os.path.join(rel_root, f).replace("\\", "/")
-                    })
+                if ext not in ALLOWED_EXT:
+                    continue
+                abs_path = os.path.normpath(os.path.join(root, f))
+                rel_path = os.path.relpath(abs_path, start=cwd).replace("\\", "/")
+                if rel_path in seen:
+                    continue
+                seen.add(rel_path)
+                images.append({"name": f, "path": rel_path})
     return images
 
 @app.route('/api/images')

@@ -304,12 +304,23 @@
         }
 
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-        .gallery-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; }
+        .gallery-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; cursor: zoom-in; }
         .gallery-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,.25); }
         .gallery-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
         .gallery-card .caption { padding: 10px 12px; font-size: .95rem; color: #b8c6db; word-break: break-word; }
         .gallery-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
         .gallery-search { padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.25); color: #fff; min-width: 260px; }
+
+        /* Lightbox */
+        .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .lightbox.open { display: flex; }
+        .lightbox-content { position: relative; max-width: 95vw; max-height: 92vh; }
+        .lightbox-img { max-width: 95vw; max-height: 92vh; transform-origin: center center; transition: transform .1s ease; cursor: grab; }
+        .lightbox-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; }
+        .lb-btn { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; cursor: pointer; }
+        .lb-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+        .lb-prev { left: 12px; }
+        .lb-next { right: 12px; }
     </style>
 </head>
 <body>
@@ -490,6 +501,21 @@
             </div>
         </div>
 
+        <!-- Lightbox -->
+        <div id="lightbox" class="lightbox" onclick="lightboxBgClose(event)">
+            <button class="lb-nav lb-prev" onclick="event.stopPropagation(); lightboxPrev()">⟨</button>
+            <div class="lightbox-content">
+                <img id="lightbox-img" class="lightbox-img" src="" alt="preview">
+                <div class="lightbox-controls">
+                    <button class="lb-btn" onclick="event.stopPropagation(); lightboxZoom(1.2)">＋</button>
+                    <button class="lb-btn" onclick="event.stopPropagation(); lightboxZoom(1/1.2)">－</button>
+                    <button class="lb-btn" onclick="event.stopPropagation(); lightboxReset()">Reset</button>
+                    <button class="lb-btn" onclick="event.stopPropagation(); lightboxClose()">Close</button>
+                </div>
+            </div>
+            <button class="lb-nav lb-next" onclick="event.stopPropagation(); lightboxNext()">⟩</button>
+        </div>
+
         <!-- Footer -->
         <div class="footer">
             <h3>Ready to Explore the Mathematical Universe?</h3>
@@ -602,13 +628,14 @@
         function renderGallery(items){
             const grid = document.getElementById('gallery-grid');
             grid.innerHTML = '';
-            items.forEach(item => {
+            items.forEach((item, idx) => {
                 const card = document.createElement('div');
                 card.className = 'gallery-card';
                 const img = document.createElement('img');
                 img.loading = 'lazy';
                 img.src = '/images/' + item.path;
                 img.alt = item.name;
+                img.addEventListener('click', () => openLightbox(idx));
                 const cap = document.createElement('div');
                 cap.className = 'caption';
                 cap.textContent = item.path;
@@ -622,6 +649,17 @@
             const filtered = __galleryItems.filter(it => it.name.toLowerCase().includes(q) || it.path.toLowerCase().includes(q));
             renderGallery(filtered);
         }
+
+        // Lightbox state
+        let lbIndex = -1; let lbScale = 1; let lbItems = [];
+        function openLightbox(index){ lbItems = __galleryItems; lbIndex = index; lbScale = 1; updateLightbox(); document.getElementById('lightbox').classList.add('open'); }
+        function updateLightbox(){ if(lbIndex<0||lbIndex>=lbItems.length) return; const img=document.getElementById('lightbox-img'); img.src = '/images/' + lbItems[lbIndex].path; img.style.transform = `scale(${lbScale})`; }
+        function lightboxClose(){ document.getElementById('lightbox').classList.remove('open'); }
+        function lightboxBgClose(e){ if(e.target.id==='lightbox') lightboxClose(); }
+        function lightboxNext(){ if(lbIndex < lbItems.length-1){ lbIndex++; lbScale=1; updateLightbox(); } }
+        function lightboxPrev(){ if(lbIndex > 0){ lbIndex--; lbScale=1; updateLightbox(); } }
+        function lightboxZoom(f){ lbScale = Math.max(0.1, Math.min(8, lbScale * f)); updateLightbox(); }
+        function lightboxReset(){ lbScale = 1; updateLightbox(); }
     </script>
 </body>
 </html>
