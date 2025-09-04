@@ -399,19 +399,32 @@
         <div id="demo" class="content-section">
             <div class="section">
                 <h2>🎮 Live Demo</h2>
-                <p>Experience the power of mathematical computing in real-time!</p>
-                
+                <p>Call real backend APIs to test Mersenne numbers and run analysis.</p>
+
                 <div class="interactive-demo">
-                    <h3>Prime Number Generator</h3>
+                    <h3>Test a Mersenne Number (2^p - 1)</h3>
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="generatePrimes()">Generate Primes</button>
-                        <button class="demo-btn" onclick="testMersenne()">Test Mersenne</button>
-                        <button class="demo-btn" onclick="showPerformance()">Show Performance</button>
-                        <button class="demo-btn" onclick="clearOutput()">Clear</button>
+                        <input id="exponent-input" type="number" min="2" max="1000" placeholder="Enter exponent p (e.g., 31)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:220px;">
+                        <button class="demo-btn" onclick="apiTestMersenne()">Run Lucas-Lehmer Test</button>
                     </div>
-                    <div id="demo-output" class="demo-output">
-                        Click a button to start the demo...
+                    <div id="demo-output" class="demo-output">Enter an exponent and click the button...</div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>Find Perfect Numbers</h3>
+                    <div class="demo-controls">
+                        <input id="perfect-limit" type="number" min="1" max="10" value="5" placeholder="How many?" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:140px;">
+                        <button class="demo-btn" onclick="apiFindPerfectNumbers()">Find</button>
                     </div>
+                    <div id="perfect-output" class="demo-output">Click find to list perfect numbers derived from Mersenne primes.</div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>Analyze Patterns + Performance</h3>
+                    <div class="demo-controls">
+                        <button class="demo-btn" onclick="apiRunAnalysis()">Run Full Analysis</button>
+                    </div>
+                    <div id="analysis-output" class="demo-output">Click to run server-side analysis and performance test.</div>
                 </div>
 
                 <div class="interactive-demo">
@@ -514,140 +527,83 @@
     <script>
         // Navigation
         function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Remove active class from all nav buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Show selected section
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            
-            // Add active class to clicked button
             event.target.classList.add('active');
         }
 
-        // Demo Functions
-        function generatePrimes() {
+        // API helpers
+        async function postJSON(url = '', data = {}) {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return res.json();
+        }
+
+        // API: Lucas-Lehmer test
+        async function apiTestMersenne() {
             const output = document.getElementById('demo-output');
-            output.innerHTML = '<strong>Generating prime numbers...</strong><br>';
-            
-            setTimeout(() => {
-                const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
-                output.innerHTML += '<strong>First 15 prime numbers:</strong><br>';
-                output.innerHTML += primes.join(', ') + '<br><br>';
-                output.innerHTML += '<em>Generated in 0.001 seconds</em>';
-            }, 1000);
+            const p = parseInt(document.getElementById('exponent-input').value, 10);
+            if (!p || p < 2) { output.innerHTML = 'Enter a valid exponent ≥ 2'; return; }
+            output.innerHTML = 'Running Lucas-Lehmer test on server...';
+            const result = await postJSON('/api/test_mersenne', { exponent: p });
+            if (result.error) { output.innerHTML = `Error: ${result.error}`; return; }
+            output.innerHTML = `
+                <strong>Exponent:</strong> ${result.exponent}<br>
+                <strong>Digits:</strong> ${result.digits}<br>
+                <strong>Is Prime:</strong> ${result.is_prime ? 'Yes ✅' : 'No ❌'}<br>
+                <strong>Time:</strong> ${result.computation_time}s
+            `;
         }
 
-        function testMersenne() {
-            const output = document.getElementById('demo-output');
-            output.innerHTML = '<strong>Testing Mersenne numbers...</strong><br>';
-            
-            setTimeout(() => {
-                output.innerHTML += '<strong>Mersenne Prime Test Results:</strong><br>';
-                output.innerHTML += '2³ - 1 = 7 ✓ (Prime)<br>';
-                output.innerHTML += '2⁵ - 1 = 31 ✓ (Prime)<br>';
-                output.innerHTML += '2⁷ - 1 = 127 ✓ (Prime)<br>';
-                output.innerHTML += '2¹¹ - 1 = 2047 ✗ (Not Prime: 23 × 89)<br><br>';
-                output.innerHTML += '<em>Lucas-Lehmer test completed</em>';
-            }, 1500);
+        // API: Perfect numbers
+        async function apiFindPerfectNumbers() {
+            const out = document.getElementById('perfect-output');
+            const limit = parseInt(document.getElementById('perfect-limit').value, 10) || 5;
+            out.innerHTML = 'Finding perfect numbers on server...';
+            const result = await postJSON('/api/find_perfect_numbers', { limit });
+            if (result.error) { out.innerHTML = `Error: ${result.error}`; return; }
+            out.innerHTML = result.perfect_numbers.map((pn, i) => `
+                #${i+1} — p=${pn.exponent}, M_p=${pn.mersenne_prime}, digits=${pn.digits}
+            `).join('<br>');
         }
 
-        function showPerformance() {
-            const output = document.getElementById('demo-output');
-            output.innerHTML = '<strong>Performance Analysis:</strong><br>';
-            output.innerHTML += 'CPU Usage: 87%<br>';
-            output.innerHTML += 'Memory: 2.3 GB<br>';
-            output.innerHTML += 'Threads: 8 active<br>';
-            output.innerHTML += 'Speed: 2.4x faster than baseline<br><br>';
-            output.innerHTML += '<em>Optimization algorithms running</em>';
+        // API: Full analysis
+        async function apiRunAnalysis() {
+            const out = document.getElementById('analysis-output');
+            out.innerHTML = 'Running full analysis on server...';
+            const res = await fetch('/api/run_analysis');
+            const result = await res.json();
+            if (result.error) { out.innerHTML = `Error: ${result.error}`; return; }
+            out.innerHTML = `
+                <strong>Total Known:</strong> ${result.patterns.total_known}<br>
+                <strong>Average Gap:</strong> ${result.patterns.average_gap.toFixed(2)}<br>
+                <strong>Perfect Numbers Generated:</strong> ${result.perfect_numbers.length}<br>
+                <strong>Perf Samples:</strong> ${result.performance_test.length}<br>
+                <strong>Analysis Time:</strong> ${result.analysis_time}s
+            `;
         }
 
-        function clearOutput() {
-            document.getElementById('demo-output').innerHTML = 'Output cleared. Ready for new demo...';
-        }
-
-        // Performance Simulation
-        let performanceInterval;
-        let currentProgress = 0;
-
+        // Performance Simulation (UI animation only)
+        let performanceInterval; let currentProgress = 0;
         function startPerformanceSim() {
-            currentProgress = 0;
-            const bar = document.getElementById('performance-bar');
-            const text = document.getElementById('performance-text');
-            
+            currentProgress = 0; const bar = document.getElementById('performance-bar'); const text = document.getElementById('performance-text');
+            clearInterval(performanceInterval);
             performanceInterval = setInterval(() => {
-                currentProgress += Math.random() * 15;
-                if (currentProgress > 100) currentProgress = 100;
-                
+                currentProgress += Math.random() * 15; if (currentProgress > 100) currentProgress = 100;
                 bar.style.width = currentProgress + '%';
-                text.innerHTML = `Algorithm Performance: ${Math.round(currentProgress)}% - ${getPerformanceStatus(currentProgress)}`;
-                
-                if (currentProgress >= 100) {
-                    clearInterval(performanceInterval);
-                    text.innerHTML = 'Performance simulation completed! Algorithm optimized successfully.';
-                }
+                text.innerHTML = `Algorithm Performance: ${Math.round(currentProgress)}%`;
+                if (currentProgress >= 100) { clearInterval(performanceInterval); text.innerHTML = 'Performance simulation completed!'; }
             }, 200);
         }
+        function stopPerformanceSim() { clearInterval(performanceInterval); document.getElementById('performance-text').innerHTML = 'Performance simulation stopped.'; }
 
-        function stopPerformanceSim() {
-            clearInterval(performanceInterval);
-            document.getElementById('performance-text').innerHTML = 'Performance simulation stopped.';
-        }
-
-        function getPerformanceStatus(progress) {
-            if (progress < 30) return 'Initializing...';
-            if (progress < 60) return 'Analyzing patterns...';
-            if (progress < 90) return 'Optimizing algorithms...';
-            return 'Finalizing optimization...';
-        }
-
-        // Add some interactive animations
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate stats on scroll
-            const observerOptions = {
-                threshold: 0.5,
-                rootMargin: '0px 0px -100px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                    }
-                });
-            }, observerOptions);
-
-            document.querySelectorAll('.stat-card, .section').forEach(el => {
-                observer.observe(el);
-            });
-        });
-
-        // Add typing effect to header
-        function typeWriter(element, text, speed = 100) {
-            let i = 0;
-            element.innerHTML = '';
-            
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
-        }
-
-        // Initialize typing effect
-        window.addEventListener('load', () => {
-            const subtitle = document.querySelector('.header p:last-child');
-            typeWriter(subtitle, 'This project represents my attempt to understand and explore that language through code.', 50);
-        });
+        // Typing effect
+        function typeWriter(element, text, speed = 100) { let i = 0; element.innerHTML = ''; (function type(){ if (i < text.length) { element.innerHTML += text.charAt(i++); setTimeout(type, speed);} })(); }
+        window.addEventListener('load', () => { const subtitle = document.querySelector('.header p:last-child'); typeWriter(subtitle, 'This project represents my attempt to understand and explore that language through code.', 50); });
     </script>
 </body>
 </html>
