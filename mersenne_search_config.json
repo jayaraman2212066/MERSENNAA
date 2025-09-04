@@ -1,0 +1,67 @@
+{
+  "search_configuration": {
+    "search_strategy": "pattern_guided",
+    "num_predictions": 5,
+    "max_workers": "auto",
+    "batch_size": 1000,
+    "early_termination": true,
+    "progress_reporting": true
+  },
+  
+  "pattern_analysis": {
+    "exponential_model_weight": 0.7,
+    "polynomial_model_weight": 0.2,
+    "gap_analysis_weight": 0.1,
+    "confidence_threshold": 0.8
+  },
+  
+  "optimization_settings": {
+    "use_miller_rabin": true,
+    "use_early_factor_check": true,
+    "use_modular_optimizations": true,
+    "use_parallel_processing": true,
+    "memory_optimization": true
+  },
+  
+  "search_ranges": {
+    "range_1": {
+      "description": "53rd Mersenne Prime - High Probability",
+      "start": 85000000,
+      "end": 90000000,
+      "priority": "high"
+    },
+    "range_2": {
+      "description": "54th Mersenne Prime - Medium Probability", 
+      "start": 90000000,
+      "end": 100000000,
+      "priority": "medium"
+    },
+    "range_3": {
+      "description": "55th Mersenne Prime - Lower Probability",
+      "start": 100000000,
+      "end": 120000000,
+      "priority": "low"
+    }
+  },
+  
+  "prime95_integration": {
+    "use_prime95_algorithms": true,
+    "fft_optimization": true,
+    "modular_multiplication": "karatsuba",
+    "memory_allocation": "dynamic"
+  },
+  
+  "hardware_optimization": {
+    "cpu_cores": "auto",
+    "gpu_acceleration": false,
+    "memory_limit_gb": 8,
+    "disk_cache": true
+  },
+  
+  "monitoring": {
+    "save_progress": true,
+    "progress_interval": 1000,
+    "backup_results": true,
+    "log_level": "info"
+  }
+}

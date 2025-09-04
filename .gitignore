@@ -1,0 +1,55 @@
+﻿# OS
+.DS_Store
+Thumbs.db
+
+# Editors/IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+.mypy_cache/
+.pytest_cache/
+
+# C/C++ build artifacts
+build/
+cmake-build*/
+*.o
+*.obj
+*.exe
+*.dll
+*.lib
+*.so
+*.dylib
+*.a
+*.lo
+*.la
+*.out
+*.pdb
+*.ilk
+
+# Logs and temp
+*.log
+*.tmp
+*.temp
+*.cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Misc
+*.swp
+*.swo
