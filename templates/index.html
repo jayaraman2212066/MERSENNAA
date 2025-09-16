@@ -704,7 +704,7 @@
                 const data = await res.json();
                 document.getElementById('progress-timestamp').innerText = data.timestamp || '';
                 const p95 = data.prime95 || {}; const pf = data.proofs || {};
-                const fmt = (f)=> f && f.exists ? `✅ ${f.size} bytes (updated ${f.modified})` : '❌ not found';
+                const fmt = (f)=> f && f.exists ? `✅ ${f.size} bytes (updated ${f.modified})` : (p95.configured ? '❌ not found' : 'ℹ️ not configured');
                 out.innerHTML = `
                     <strong>Prime95 results.txt</strong>: ${fmt(p95.results)}<br>
                     <strong>Prime95 worktodo.txt</strong>: ${fmt(p95.worktodo)}<br>

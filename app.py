@@ -341,8 +341,11 @@ def progress():
     except Exception:
         pass
     p95 = (cfg.get('prime95_integration') or {})
-    results_path = p95.get('results_path') or 'C:/Prime95/results.txt'
-    worktodo_path = p95.get('worktodo_path') or 'C:/Prime95/worktodo.txt'
+    # If not explicitly enabled or running on a non-Windows environment like Render,
+    # treat Prime95 as not configured and avoid probing Windows paths.
+    is_configured = bool(p95.get('enabled')) and os.name == 'nt'
+    results_path = p95.get('results_path') if is_configured else None
+    worktodo_path = p95.get('worktodo_path') if is_configured else None
 
     proofs = {
         "demo": _file_info(os.path.join('proofs','mersenne_proof_demo.png')),
@@ -353,9 +356,9 @@ def progress():
     return jsonify({
         "timestamp": datetime.now().isoformat(),
         "prime95": {
-            "results": _file_info(results_path),
-            "worktodo": _file_info(worktodo_path),
-            "configured": bool(p95)
+            "results": _file_info(results_path) if results_path else {"exists": False},
+            "worktodo": _file_info(worktodo_path) if worktodo_path else {"exists": False},
+            "configured": is_configured
         },
         "proofs": proofs
     })
