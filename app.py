@@ -71,8 +71,7 @@ class MersenneCalculator:
         if p <= 0:
             return {"valid": False, "error": "Exponent must be positive"}
         
-        if p > 5000:  # Limit for demo purposes
-            return {"valid": False, "error": "Exponent too large for demo (max 5000)"}
+        # No artificial upper bound on exponent for live demo
         
         try:
             M = (1 << p) - 1
@@ -97,7 +96,8 @@ class MersenneCalculator:
         perfect_numbers = []
         count = 0
         
-        for p in range(2, 1000):  # Limit for demo
+        # Iterate over exponents without a low upper bound; stop when limit is reached
+        for p in range(2, 100000):
             if count >= limit:
                 break
             
@@ -211,8 +211,8 @@ def find_perfect_numbers():
         data = request.get_json()
         limit = int(data.get('limit', 5))
         
-        if limit <= 0 or limit > 20:
-            return jsonify({"error": "Limit must be between 1 and 20"})
+        if limit <= 0:
+            return jsonify({"error": "Limit must be positive"})
         
         perfect_numbers = calculator.find_perfect_numbers(limit)
         return jsonify({
@@ -240,13 +240,13 @@ def performance_test():
         data = request.get_json()
         max_exponent = int(data.get('max_exponent', 100))
         
-        if max_exponent <= 0 or max_exponent > 500:
-            return jsonify({"error": "Max exponent must be between 1 and 500"})
+        if max_exponent <= 0:
+            return jsonify({"error": "Max exponent must be positive"})
         
         results = []
         total_time = 0
         
-        for p in range(2, min(max_exponent + 1, 100)):
+        for p in range(2, max_exponent + 1):
             if p in calculator.known_mersenne_primes:
                 start_time = time.time()
                 is_prime = calculator.lucas_lehmer_test(p)

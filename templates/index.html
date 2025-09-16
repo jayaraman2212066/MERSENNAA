@@ -424,16 +424,16 @@
                 <div class="interactive-demo">
                     <h3>Test a Mersenne Number (2^p - 1)</h3>
                     <div class="demo-controls">
-                        <input id="exponent-input" type="number" min="2" max="5000" placeholder="Enter exponent p (2..5000)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:220px;">
+                        <input id="exponent-input" type="number" min="2" placeholder="Enter exponent p (>=2, no upper limit)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:220px;">
                         <button class="demo-btn" onclick="apiTestMersenne()">Run Lucas-Lehmer Test</button>
                     </div>
-                    <div id="demo-output" class="demo-output">Enter an exponent between 2 and 5000 and click the button...</div>
+                    <div id="demo-output" class="demo-output">Enter any exponent p ≥ 2 and click the button...</div>
                 </div>
 
                 <div class="interactive-demo">
                     <h3>Find Perfect Numbers</h3>
                     <div class="demo-controls">
-                        <input id="perfect-limit" type="number" min="1" max="20" value="5" placeholder="How many? (1..20)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:140px;">
+                        <input id="perfect-limit" type="number" min="1" value="5" placeholder="How many? (≥1, no cap)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:140px;">
                         <button class="demo-btn" onclick="apiFindPerfectNumbers()">Find</button>
                     </div>
                     <div id="perfect-output" class="demo-output">Click find to list perfect numbers derived from Mersenne primes.</div>
@@ -582,7 +582,7 @@
         async function apiTestMersenne() {
             const output = document.getElementById('demo-output');
             const p = parseInt(document.getElementById('exponent-input').value, 10);
-            if (!p || p < 2 || p > 5000) { output.innerHTML = 'Enter a valid exponent in range 2..5000'; return; }
+            if (!p || p < 2) { output.innerHTML = 'Enter a valid exponent p ≥ 2'; return; }
             output.innerHTML = 'Running Lucas-Lehmer test on server...';
             const result = await postJSON('/api/test_mersenne', { exponent: p });
             if (result.error) { output.innerHTML = `Error: ${result.error}`; return; }
@@ -598,7 +598,7 @@
         async function apiFindPerfectNumbers() {
             const out = document.getElementById('perfect-output');
             const limit = parseInt(document.getElementById('perfect-limit').value, 10) || 5;
-            if (limit < 1 || limit > 20) { out.innerHTML = 'Enter a count between 1 and 20'; return; }
+            if (limit < 1) { out.innerHTML = 'Enter a count ≥ 1'; return; }
             out.innerHTML = 'Finding perfect numbers on server...';
             const result = await postJSON('/api/find_perfect_numbers', { limit });
             if (result.error) { out.innerHTML = `Error: ${result.error}`; return; }
