@@ -1,7 +1,7 @@
 {
   "search_configuration": {
     "search_strategy": "pattern_guided",
-    "num_predictions": 5,
+    "num_predictions": 1,
     "max_workers": "auto",
     "batch_size": 1000,
     "early_termination": true,
@@ -25,30 +25,24 @@
   
   "search_ranges": {
     "range_1": {
-      "description": "53rd Mersenne Prime - High Probability",
+      "description": "Focused slice for quick Prime95 feedback",
       "start": 85000000,
-      "end": 90000000,
+      "end": 85200000,
       "priority": "high"
     },
-    "range_2": {
-      "description": "54th Mersenne Prime - Medium Probability", 
-      "start": 90000000,
-      "end": 100000000,
-      "priority": "medium"
-    },
-    "range_3": {
-      "description": "55th Mersenne Prime - Lower Probability",
-      "start": 100000000,
-      "end": 120000000,
-      "priority": "low"
-    }
+    "range_2": null,
+    "range_3": null
   },
   
   "prime95_integration": {
-    "use_prime95_algorithms": true,
-    "fft_optimization": true,
-    "modular_multiplication": "karatsuba",
-    "memory_allocation": "dynamic"
+    "enabled": true,
+    "prime95_dir": "C:/Prime95",
+    "worktodo_path": "C:/Prime95/worktodo.txt",
+    "mode": "LL",
+    "append": true,
+    "auto_launch": false,
+    "use_for_ll": false,
+    "results_path": "C:/Prime95/results.txt"
   },
   
   "hardware_optimization": {
@@ -63,5 +57,9 @@
     "progress_interval": 1000,
     "backup_results": true,
     "log_level": "info"
+  },
+  "cpp_core": {
+    "enabled": false,
+    "exe_path": "candidate_generator.exe"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "search_interrupted": true,
-  "candidates_tested": 3925,
-  "last_exponent_tested": 82597783,
-  "search_time": 0.0012515366739696927,
-  "timestamp": "2025-09-01T22:31:18.268682"
+  "last_exponent_tested": 85183771,
+  "prime95_results_offset": 0,
+  "total_candidates_tested": 10000,
+  "total_primes_found": 0,
+  "timestamp": 1758039621.5850246
 }

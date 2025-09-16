@@ -1,0 +1,10 @@
+﻿[Now] Small-to-mid Mersenne LL confirmations
+M( 2 ) is prime!
+M( 3 ) is prime!
+M( 5 ) is prime!
+M( 7 ) is prime!
+M( 13 ) is prime!
+M( 17 ) is prime!
+M( 19 ) is prime!
+M( 31 ) is prime!
+M( 61 ) is prime!  ->  2^61 - 1 = 2,305,843,009,213,693,951

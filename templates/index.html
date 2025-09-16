@@ -339,6 +339,7 @@
             <button class="nav-btn" onclick="showSection('demo')">Live Demo</button>
             <button class="nav-btn" onclick="showSection('achievements')">Achievements</button>
             <button class="nav-btn" onclick="openGallery()">Gallery</button>
+            <button class="nav-btn" onclick="showSection('progress')">Progress</button>
         </div>
 
         <!-- Overview Section -->
@@ -498,6 +499,39 @@
                 </div>
                 <div id="gallery-grid" class="gallery-grid"></div>
                 <div id="gallery-empty" class="demo-output" style="display:none;">No images found.</div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="progress" class="content-section">
+            <div class="section">
+                <h2>📡 Live Progress</h2>
+                <div class="interactive-demo">
+                    <div class="demo-controls">
+                        <button class="demo-btn" onclick="loadProgress()">Refresh</button>
+                        <span id="progress-timestamp" style="color:#b8c6db"></span>
+                    </div>
+                    <div id="progress-out" class="demo-output">Click Refresh to load current status...</div>
+                    <div class="interactive-demo">
+                        <h3>Queue Mersenne Exponents (no limit)</h3>
+                        <div class="demo-controls">
+                            <input id="queue-exps" placeholder="Enter exponents comma-separated (e.g., 85000007,85000021)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:360px;">
+                            <select id="queue-mode" style="padding:10px;border-radius:8px;border:1px solid #333;">
+                                <option value="LL">LL</option>
+                                <option value="PRP">PRP</option>
+                                <option value="PFACTOR">PFACTOR</option>
+                            </select>
+                            <button class="demo-btn" onclick="queueMersenne()">Queue</button>
+                        </div>
+                        <div id="queue-out" class="demo-output">Enter exponents to queue into Prime95 WorkToDo.</div>
+                    </div>
+                    <div style="margin-top:12px">
+                        <a id="proof-link-demo" class="github-link" style="margin-right:10px" href="/images/proofs/mersenne_proof_demo.png" target="_blank">View Demo Proof</a>
+                        <a id="proof-link-small" class="github-link" style="margin-right:10px" href="/images/proofs/mersenne_proof_small.png" target="_blank">View Small Proof</a>
+                        <a id="proof-link-upto61" class="github-link" style="margin-right:10px" href="/images/proofs/mersenne_proof_upto61.png" target="_blank">View 2^61−1 Proof</a>
+                        <a id="proof-link-live" class="github-link" href="/images/proofs/mersenne_proof.png" target="_blank">View Live Proof (auto)</a>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -661,6 +695,42 @@
         function lightboxPrev(){ if(lbIndex > 0){ lbIndex--; lbScale=1; updateLightbox(); } }
         function lightboxZoom(f){ lbScale = Math.max(0.1, Math.min(8, lbScale * f)); updateLightbox(); }
         function lightboxReset(){ lbScale = 1; updateLightbox(); }
+
+        // Progress loader
+        async function loadProgress(){
+            const out = document.getElementById('progress-out');
+            try{
+                const res = await fetch('/api/progress');
+                const data = await res.json();
+                document.getElementById('progress-timestamp').innerText = data.timestamp || '';
+                const p95 = data.prime95 || {}; const pf = data.proofs || {};
+                const fmt = (f)=> f && f.exists ? `✅ ${f.size} bytes (updated ${f.modified})` : '❌ not found';
+                out.innerHTML = `
+                    <strong>Prime95 results.txt</strong>: ${fmt(p95.results)}<br>
+                    <strong>Prime95 worktodo.txt</strong>: ${fmt(p95.worktodo)}<br>
+                    <strong>Proof (demo)</strong>: ${fmt(pf.demo)}<br>
+                    <strong>Proof (small)</strong>: ${fmt(pf.small)}<br>
+                    <strong>Proof (2^61−1)</strong>: ${fmt(pf.upto61)}<br>
+                    <strong>Proof (live)</strong>: ${fmt(pf.live)}
+                `;
+            }catch(e){ out.innerText = 'Failed to load progress.' }
+        }
+
+        async function queueMersenne(){
+            const out = document.getElementById('queue-out');
+            const raw = (document.getElementById('queue-exps').value || '').trim();
+            if(!raw){ out.innerText='Enter at least one exponent.'; return; }
+            const mode = (document.getElementById('queue-mode').value || 'LL');
+            const exps = raw.split(',').map(s=>parseInt(s.trim(),10)).filter(n=>Number.isFinite(n)&&n>1);
+            if(!exps.length){ out.innerText='No valid exponents.'; return; }
+            out.innerText = 'Queuing...';
+            try{
+                const res = await fetch('/api/queue_mersenne', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ exponents: exps, mode }) });
+                const data = await res.json();
+                if(data.error){ out.innerText = 'Error: ' + data.error; return; }
+                out.innerText = `Queued ${data.queued} exponent(s) in ${data.mode} mode. WorkToDo: ${data.worktodo}`;
+            }catch(e){ out.innerText='Failed to queue.'; }
+        }
     </script>
 </body>
 </html>

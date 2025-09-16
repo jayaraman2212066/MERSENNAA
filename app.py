@@ -5,6 +5,7 @@ import time
 import threading
 from datetime import datetime
 import os
+from prime95_integration import integrate_with_prime95
 
 app = Flask(__name__)
 
@@ -317,6 +318,83 @@ def status():
         "calculator_ready": True,
         "known_mersenne_count": len(calculator.known_mersenne_primes)
     })
+
+# --- Progress reporting for live demo ---
+def _file_info(path: str):
+    try:
+        st = os.stat(path)
+        return {
+            "exists": True,
+            "size": st.st_size,
+            "modified": datetime.fromtimestamp(st.st_mtime).isoformat()
+        }
+    except Exception:
+        return {"exists": False}
+
+@app.route('/api/progress')
+def progress():
+    """Report current pipeline progress for UI (Prime95 + proofs)."""
+    cfg = {}
+    try:
+        with open('mersenne_search_config.json','r',encoding='utf-8') as f:
+            cfg = json.load(f)
+    except Exception:
+        pass
+    p95 = (cfg.get('prime95_integration') or {})
+    results_path = p95.get('results_path') or 'C:/Prime95/results.txt'
+    worktodo_path = p95.get('worktodo_path') or 'C:/Prime95/worktodo.txt'
+
+    proofs = {
+        "demo": _file_info(os.path.join('proofs','mersenne_proof_demo.png')),
+        "small": _file_info(os.path.join('proofs','mersenne_proof_small.png')),
+        "upto61": _file_info(os.path.join('proofs','mersenne_proof_upto61.png')),
+        "live": _file_info(os.path.join('proofs','mersenne_proof.png')),
+    }
+    return jsonify({
+        "timestamp": datetime.now().isoformat(),
+        "prime95": {
+            "results": _file_info(results_path),
+            "worktodo": _file_info(worktodo_path),
+            "configured": bool(p95)
+        },
+        "proofs": proofs
+    })
+
+@app.route('/api/queue_mersenne', methods=['POST'])
+def queue_mersenne():
+    """Append one or more exponents to Prime95 WorkToDo (no upper limit)."""
+    try:
+        data = request.get_json(force=True)
+        exps = data.get('exponents')
+        mode = (data.get('mode') or 'LL').upper()
+        if isinstance(exps, int):
+            exponents = [int(exps)]
+        elif isinstance(exps, list):
+            exponents = [int(x) for x in exps if int(x) > 1]
+        else:
+            return jsonify({"error": "Provide 'exponents' as int or list of ints"}), 400
+
+        # Load config and integrate
+        cfg = {}
+        try:
+            with open('mersenne_search_config.json','r',encoding='utf-8') as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+        # force mode if provided
+        if 'prime95_integration' in cfg:
+            cfg['prime95_integration']['mode'] = mode
+
+        result = integrate_with_prime95(exponents, cfg)
+        return jsonify({
+            "queued": len(exponents),
+            "mode": mode,
+            "worktodo": result.get('worktodo_path'),
+            "lines_written": result.get('lines_written'),
+            "launched": result.get('launched', False)
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     # For local development
