@@ -211,6 +211,14 @@ def serve_image(filename):
     folder, file = os.path.split(safe_path)
     return send_from_directory(folder, file)
 
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    """Serve static assets like images in assets/ directory."""
+    try:
+        return send_from_directory('assets', filename, as_attachment=False)
+    except FileNotFoundError:
+        return jsonify({"error": "Asset not found"}), 404
+
 @app.route('/api/test_mersenne', methods=['POST'])
 def test_mersenne():
     """API endpoint to test Mersenne numbers"""
