@@ -111,7 +111,7 @@ class EnhancedMersenneDiscovery:
         }
     
     def is_valid_mersenne_exponent_candidate(self, p: int) -> bool:
-        """Check if a number is a valid Mersenne exponent candidate based on comprehensive mathematical properties"""
+        """Check if a number is a valid Mersenne exponent candidate based on essential mathematical properties"""
         # Must be > 52nd Mersenne prime
         if p <= self.last_known_exponent:
             return False
@@ -136,62 +136,20 @@ class EnhancedMersenneDiscovery:
         if p > 5 and p % 10 not in [1, 3, 7, 9]:
             return False
         
-        # Advanced Mersenne exponent pattern analysis
-        p_str = str(p)
+        # Basic binary properties
         binary = bin(p)[2:]
         
-        # Binary properties (most exponents start and end with 1)
-        if not binary.startswith('1') or not binary.endswith('1'):
+        # Must start with 1 (all positive numbers do, but good to check)
+        if not binary.startswith('1'):
             return False
         
-        # Binary length analysis (avoid too short or too regular)
-        binary_length = len(binary)
-        if binary_length < 15:  # Too small for large Mersenne exponents
+        # Reasonable binary length for large Mersenne exponents
+        if len(binary) < 20:
             return False
         
-        # Popcount analysis (number of 1s in binary)
-        popcount = binary.count('1')
-        if popcount < 5 or popcount > 20:  # Based on statistical analysis
-            return False
-        
-        # Digit sum analysis
-        digit_sum = sum(int(d) for d in p_str)
-        if digit_sum < 10 or digit_sum > 50:  # Reasonable range for large numbers
-            return False
-        
-        # Suffix pattern analysis (last 2-3 digits)
-        last_two = p_str[-2:] if len(p_str) >= 2 else p_str
-        last_three = p_str[-3:] if len(p_str) >= 3 else p_str
-        
-        # Check for common Mersenne exponent suffixes
-        common_suffixes = ['17', '21', '33', '57', '61', '81', '89']
-        if last_two not in common_suffixes and last_three not in ['107', '127', '503', '607']:
-            # Still allow, but with lower priority
-            pass
-        
-        # Avoid numbers with too many repeated digits (unlikely for large Mersenne exponents)
-        if len(set(p_str)) < len(p_str) // 3:
-            return False
-        
-        # Check for Sophie Germain prime properties (bonus points)
-        sophie_germain = self.is_prime(2 * p + 1)
-        
-        # Check for safe prime properties (bonus points)
-        safe_prime = self.is_prime((p - 1) // 2) if p > 2 else False
-        
-        # Hex pattern analysis
-        hex_str = hex(p)[2:].upper()
-        if 'FF' in hex_str or hex_str.endswith('F'):
-            # Bonus for hex patterns similar to known Mersenne exponents
-            pass
-        
-        # Digital root analysis
-        digital_root = self.calculate_digital_root(p)
-        
-        # Modulo 210 analysis (2*3*5*7)
+        # Basic modulo 210 check (exclude obvious composites)
         mod_210 = p % 210
-        preferred_mod_210 = [1, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 143, 149, 151, 157, 163, 167, 169, 173, 179, 181, 187, 191, 193, 197, 199, 209]
-        if mod_210 not in preferred_mod_210:
+        if mod_210 % 2 == 0 or mod_210 % 3 == 0 or mod_210 % 5 == 0 or mod_210 % 7 == 0:
             return False
         
         return True
@@ -264,8 +222,8 @@ class EnhancedMersenneDiscovery:
         
         candidates = []
         
-        # Use advanced pattern analysis if available
-        if self.pattern_analyzer:
+        # Use advanced pattern analysis if available (temporarily disabled for testing)
+        if False and self.pattern_analyzer:
             print(f"🧠 Using advanced pattern analysis for intelligent candidate generation...")
             priority_candidates = self.pattern_analyzer.generate_priority_candidates(effective_start, end, count)
             candidates = [candidate for candidate, score in priority_candidates]
