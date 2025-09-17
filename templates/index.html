@@ -339,6 +339,7 @@
             <button class="nav-btn" onclick="showSection('demo')">Live Demo</button>
             <button class="nav-btn" onclick="showSection('achievements')">Achievements</button>
             <button class="nav-btn" onclick="openGallery()">Gallery</button>
+            <button class="nav-btn" onclick="showSection('image')">Image</button>
             <button class="nav-btn" onclick="showSection('progress')">Progress</button>
             <button class="nav-btn" onclick="viewResearchPaper()">📄 Research</button>
         </div>
@@ -368,12 +369,7 @@
                     </div>
                 </div>
 
-                <div style="margin-top:16px; display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start;">
-                    <div style="flex:1 1 360px; min-width:260px; border:1px solid #333; border-radius:10px; overflow:hidden; background:#0b1220;">
-                        <div style="padding:8px 10px; border-bottom:1px solid #222; font-weight:600;">Featured Visual</div>
-                        <img src="/assets/images.jpg" alt="Project featured visual" title="Project featured visual" style="width:100%; height:auto; display:block;">
-                    </div>
-                </div>
+                
             </div>
 
             <div class="section">
@@ -596,6 +592,17 @@
                 </div>
                 <div id="gallery-grid" class="gallery-grid"></div>
                 <div id="gallery-empty" class="demo-output" style="display:none;">No images found.</div>
+            </div>
+        </div>
+
+        <!-- Single Image Tab Section -->
+        <div id="image" class="content-section">
+            <div class="section">
+                <h2>🖼️ Image</h2>
+                <div style="border:1px solid #333; border-radius:10px; overflow:hidden; background:#0b1220;">
+                    <div style="padding:8px 10px; border-bottom:1px solid #222; font-weight:600;">Featured Visual</div>
+                    <img src="/assets/images.jpg" alt="Project featured visual" title="Project featured visual" style="width:100%; height:auto; display:block;">
+                </div>
             </div>
         </div>
 
@@ -1049,12 +1056,6 @@
                 card.appendChild(img); card.appendChild(cap);
                 grid.appendChild(card);
             });
-            // Add assets featured jpg at the end
-            const extra = document.createElement('div'); extra.className='gallery-card';
-            const eimg = document.createElement('img'); eimg.loading='lazy'; eimg.src='/assets/images.jpg'; eimg.alt='Project featured visual'; eimg.title='Project featured visual';
-            const ecap = document.createElement('div'); ecap.className='caption'; ecap.textContent='assets/images.jpg';
-            extra.appendChild(eimg); extra.appendChild(ecap);
-            grid.appendChild(extra);
         }
 
         function filterGallery(){
