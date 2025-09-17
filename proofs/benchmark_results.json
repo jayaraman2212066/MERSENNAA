@@ -1,0 +1,67 @@
+{
+  "average_time": 0.0001,
+  "results": [
+    {
+      "computation_time": 0.0,
+      "exponent": 2,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 3,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 5,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 7,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 13,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 17,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 19,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 31,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 61,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.001,
+      "exponent": 89,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 107,
+      "is_prime": true
+    },
+    {
+      "computation_time": 0.0,
+      "exponent": 127,
+      "is_prime": true
+    }
+  ],
+  "total_tested": 12,
+  "total_time": 0.001
+}

@@ -72,7 +72,7 @@ class MersenneCalculator:
                 return False
         return True
     
-    def lucas_lehmer_test(self, p: int, time_budget_seconds: float | None = None):
+    def lucas_lehmer_test(self, p: int, time_budget_seconds: "Optional[float]" = None):
         """Lucas-Lehmer primality test for Mersenne numbers with optional time budget.
         Returns True/False, or raises TimeoutError if budget exceeded.
         """
@@ -87,7 +87,7 @@ class MersenneCalculator:
                 raise TimeoutError("Lucas-Lehmer timed out")
         return s == 0
     
-    def test_mersenne_number(self, p, time_budget_seconds: float | None = 8.0):
+    def test_mersenne_number(self, p, time_budget_seconds: "Optional[float]" = 8.0):
         """Test if 2^p - 1 is prime"""
         start_time = time.time()
         
@@ -358,6 +358,14 @@ def download_research():
                                  download_name='MERSENNE_Research_Paper.pdf')
     except FileNotFoundError:
         return jsonify({"error": "Research paper not found"}), 404
+
+@app.route('/proofs/<path:filename>')
+def serve_proof(filename):
+    """Serve proof artifacts like benchmark_chart.png and JSON."""
+    try:
+        return send_from_directory('proofs', filename, as_attachment=False)
+    except FileNotFoundError:
+        return jsonify({"error": "Proof artifact not found"}), 404
 
 # --- Progress reporting for live demo ---
 def _file_info(path: str):
