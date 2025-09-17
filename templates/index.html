@@ -1046,6 +1046,9 @@
             const grid = document.getElementById('gallery-grid');
             grid.innerHTML = '';
             items.forEach((item, idx) => {
+                // Exclude assets directory images (e.g., assets/images.jpg) from Gallery
+                const p = (item.path || '').toLowerCase();
+                if (p.startsWith('assets/') || p === 'assets/images.jpg') { return; }
                 const card = document.createElement('div');
                 card.className = 'gallery-card';
                 const img = document.createElement('img');
