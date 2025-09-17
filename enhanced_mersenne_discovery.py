@@ -25,10 +25,10 @@ class EnhancedMersenneDiscovery:
             23209, 44497, 86243, 110503, 132049, 216091, 756839, 859433,
             1257787, 1398269, 2976221, 3021377, 6972593, 13466917, 20996011,
             24036583, 25964951, 30402457, 32582657, 37156667, 42643801,
-            43112609, 57885161, 74207281, 77232917, 82589933
+            43112609, 57885161, 74207281, 77232917, 82589933, 136279841
         ]
         
-        # The 52nd Mersenne prime exponent (82589933) - we only search after this
+        # The 52nd Mersenne prime exponent (136279841) - we only search after this
         self.last_known_exponent = max(self.known_mersenne_primes)
         
         # Discovery state
@@ -208,7 +208,7 @@ class EnhancedMersenneDiscovery:
         return True
     
     def generate_candidates_after_52nd(self, start: int, end: int, count: int = 1000) -> List[int]:
-        """Generate VALID Mersenne exponent candidates ONLY after the 52nd Mersenne prime (82589933)"""
+        """Generate VALID Mersenne exponent candidates ONLY after the 52nd Mersenne prime (136279841)"""
         # Ensure we only search after the 52nd known Mersenne prime
         effective_start = max(start, self.last_known_exponent + 1)
         

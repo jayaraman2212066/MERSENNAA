@@ -10,16 +10,16 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
-import datetime
+from datetime import datetime
 import os
 
 
 def create_analysis_pdf():
 	"""Create comprehensive PDF analysis of MERSENNE project"""
-	
+
 	doc = SimpleDocTemplate("MERSENNE_PROJECT_ANALYSIS.pdf", pagesize=A4,
-						  rightMargin=72, leftMargin=72,
-						  topMargin=72, bottomMargin=18)
+					  rightMargin=72, leftMargin=72,
+					  topMargin=72, bottomMargin=18)
 	styles = getSampleStyleSheet()
 	
 	title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24, spaceAfter=30, alignment=TA_CENTER, textColor=colors.darkblue)
@@ -32,7 +32,7 @@ def create_analysis_pdf():
 	story.append(Spacer(1, 20))
 	story.append(Paragraph("Revolutionary Mathematical Discovery System", heading_style))
 	story.append(Spacer(1, 20))
-	story.append(Paragraph(f"Generated: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", body_style))
+	story.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", body_style))
 	story.append(Spacer(1, 20))
 	story.append(Paragraph("Executive Summary: 94.2% Efficient Mersenne Prime Discovery System", body_style))
 	story.append(PageBreak())
@@ -52,7 +52,12 @@ def create_analysis_pdf():
 	]:
 		story.append(Paragraph(item, body_style))
 	story.append(PageBreak())
-	
+
+	# Timestamp header
+	ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
+	story.append(Paragraph(f"Generated on: {ts}", body_style))
+	story.append(Spacer(1, 12))
+
 	# Minimal core to keep the PDF short here, we primarily add the benchmark proof section
 	story.append(Paragraph("9. 📈 BENCHMARK PROOF (REAL DATA)", heading_style))
 	story.append(Paragraph("This section provides a real, reproducible benchmark captured from the backend /api/performance_test endpoint.", body_style))
@@ -75,7 +80,7 @@ def create_analysis_pdf():
 	story.append(Paragraph("3) python generate_analysis_pdf.py", body_style))
 	
 	doc.build(story)
-	print("✅ PDF analysis updated with benchmark proof: MERSENNE_PROJECT_ANALYSIS.pdf")
+	print("PDF analysis updated with benchmark proof: MERSENNE_PROJECT_ANALYSIS.pdf")
 
 
 if __name__ == "__main__":
