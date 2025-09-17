@@ -25,6 +25,27 @@ except ImportError:
     def generate_perfect_number_graph():
         return {"status": "Graph generator not available"}
 
+# Import revolutionary discovery system
+try:
+    from revolutionary_mersenne_discovery import RevolutionaryMersenneDiscovery
+    from advanced_candidate_generator import AdvancedCandidateGenerator
+    DISCOVERY_AVAILABLE = True
+except ImportError:
+    DISCOVERY_AVAILABLE = False
+    print("⚠️ Revolutionary discovery system not available")
+
+# Global discovery state for live demo
+discovery_state = {
+    "running": False,
+    "engine": None,
+    "start_time": None,
+    "candidates_tested": 0,
+    "discoveries": [],
+    "current_candidate": None,
+    "test_rate": 0.0,
+    "threads_active": 0
+}
+
 class MersenneCalculator:
     def __init__(self):
         self.known_mersenne_primes = [
@@ -396,6 +417,156 @@ def queue_mersenne():
             "lines_written": result.get('lines_written'),
             "launched": result.get('launched', False)
         })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/start_discovery', methods=['POST'])
+def start_discovery():
+    """Start revolutionary Mersenne prime discovery (unlimited range)"""
+    if not DISCOVERY_AVAILABLE:
+        return jsonify({"error": "Revolutionary discovery system not available"}), 500
+    
+    try:
+        data = request.get_json()
+        start_range = int(data.get('start_range', 85000000))
+        end_range = int(data.get('end_range', 86000000))
+        max_candidates = int(data.get('max_candidates', 10000))
+        workers = int(data.get('workers', 4))
+        
+        if discovery_state["running"]:
+            return jsonify({"error": "Discovery already running"}), 400
+        
+        # Validate parameters
+        if start_range < 2 or end_range <= start_range:
+            return jsonify({"error": "Invalid range parameters"}), 400
+        
+        if max_candidates < 1 or max_candidates > 1000000:
+            return jsonify({"error": "Max candidates must be between 1 and 1,000,000"}), 400
+        
+        if workers < 1 or workers > 16:
+            return jsonify({"error": "Workers must be between 1 and 16"}), 400
+        
+        # Initialize discovery engine
+        discovery_state["engine"] = RevolutionaryMersenneDiscovery()
+        discovery_state["engine"].config["optimization_settings"]["max_workers"] = workers
+        discovery_state["start_time"] = time.time()
+        discovery_state["running"] = True
+        discovery_state["candidates_tested"] = 0
+        discovery_state["discoveries"] = []
+        discovery_state["current_candidate"] = None
+        discovery_state["test_rate"] = 0.0
+        discovery_state["threads_active"] = 0
+        
+        # Start discovery in background thread
+        def run_discovery():
+            try:
+                discoveries = discovery_state["engine"].run_discovery(start_range, end_range, max_candidates)
+                discovery_state["discoveries"] = discoveries
+            except Exception as e:
+                print(f"Discovery error: {e}")
+            finally:
+                discovery_state["running"] = False
+        
+        discovery_thread = threading.Thread(target=run_discovery)
+        discovery_thread.daemon = True
+        discovery_thread.start()
+        
+        return jsonify({
+            "status": "started",
+            "start_range": start_range,
+            "end_range": end_range,
+            "max_candidates": max_candidates,
+            "workers": workers,
+            "start_time": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/discovery_status')
+def discovery_status():
+    """Get current discovery status and progress"""
+    if not DISCOVERY_AVAILABLE:
+        return jsonify({"error": "Revolutionary discovery system not available"}), 500
+    
+    try:
+        # Update stats from engine if available
+        if discovery_state["engine"]:
+            discovery_state["candidates_tested"] = getattr(discovery_state["engine"], 'candidates_tested', 0)
+            discovery_state["discoveries"] = getattr(discovery_state["engine"], 'discoveries', [])
+            discovery_state["threads_active"] = len(getattr(discovery_state["engine"], 'threads', []))
+            
+            # Calculate test rate
+            if discovery_state["start_time"]:
+                elapsed = time.time() - discovery_state["start_time"]
+                if elapsed > 0:
+                    discovery_state["test_rate"] = discovery_state["candidates_tested"] / elapsed
+        
+        return jsonify({
+            "running": discovery_state["running"],
+            "candidates_tested": discovery_state["candidates_tested"],
+            "discoveries": discovery_state["discoveries"],
+            "current_candidate": discovery_state["current_candidate"],
+            "test_rate": round(discovery_state["test_rate"], 2),
+            "threads_active": discovery_state["threads_active"],
+            "start_time": discovery_state["start_time"],
+            "elapsed_time": time.time() - discovery_state["start_time"] if discovery_state["start_time"] else 0,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/stop_discovery', methods=['POST'])
+def stop_discovery():
+    """Stop the running discovery process"""
+    if not DISCOVERY_AVAILABLE:
+        return jsonify({"error": "Revolutionary discovery system not available"}), 500
+    
+    try:
+        if not discovery_state["running"]:
+            return jsonify({"error": "No discovery running"}), 400
+        
+        discovery_state["running"] = False
+        if discovery_state["engine"]:
+            discovery_state["engine"].running = False
+        
+        return jsonify({
+            "status": "stopped",
+            "candidates_tested": discovery_state["candidates_tested"],
+            "discoveries": discovery_state["discoveries"],
+            "stop_time": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/generate_candidates', methods=['POST'])
+def generate_candidates():
+    """Generate intelligent candidates using pattern analysis"""
+    if not DISCOVERY_AVAILABLE:
+        return jsonify({"error": "Revolutionary discovery system not available"}), 500
+    
+    try:
+        data = request.get_json()
+        start_range = int(data.get('start_range', 85000000))
+        end_range = int(data.get('end_range', 86000000))
+        count = int(data.get('count', 1000))
+        
+        if count < 1 or count > 10000:
+            return jsonify({"error": "Count must be between 1 and 10,000"}), 400
+        
+        generator = AdvancedCandidateGenerator()
+        candidates = generator.generate_intelligent_candidates(start_range, end_range, count)
+        analysis = generator.analyze_candidate_quality(candidates)
+        
+        return jsonify({
+            "candidates": candidates,
+            "analysis": analysis,
+            "count": len(candidates),
+            "timestamp": datetime.now().isoformat()
+        })
+        
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
