@@ -689,11 +689,11 @@
                 }
                 
                 // Animate progress bar
-                clearInterval(performanceInterval);
-                performanceInterval = setInterval(() => {
+            clearInterval(performanceInterval);
+            performanceInterval = setInterval(() => {
                     currentProgress += 2;
                     if (currentProgress > 100) currentProgress = 100;
-                    bar.style.width = currentProgress + '%';
+                bar.style.width = currentProgress + '%';
                     if (currentProgress >= 100) {
                         clearInterval(performanceInterval);
                         showPerformanceResults(data);

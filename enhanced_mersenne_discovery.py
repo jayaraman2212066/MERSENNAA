@@ -101,8 +101,97 @@ class EnhancedMersenneDiscovery:
             "growth_rate": growth_rate
         }
     
+    def is_valid_mersenne_exponent_candidate(self, p: int) -> bool:
+        """Check if a number is a valid Mersenne exponent candidate based on mathematical properties"""
+        # Must be > 52nd Mersenne prime
+        if p <= self.last_known_exponent:
+            return False
+        
+        # Must be odd (except 2, but we're after 52nd)
+        if p % 2 == 0:
+            return False
+        
+        # Must be prime
+        if not self.is_prime(p):
+            return False
+        
+        # Modulo 4: must be ≡ 1 or 3 (all odd primes)
+        if p % 4 not in [1, 3]:
+            return False
+        
+        # Modulo 6: must be ≡ 1 or 5 (all primes > 3)
+        if p > 3 and p % 6 not in [1, 5]:
+            return False
+        
+        # Last digit: must end in 1, 3, 7, or 9 (except 2, 5)
+        if p > 5 and p % 10 not in [1, 3, 7, 9]:
+            return False
+        
+        # Additional Mersenne-specific patterns
+        # Check for common Mersenne exponent patterns
+        p_str = str(p)
+        
+        # Avoid numbers with too many repeated digits (unlikely for large Mersenne exponents)
+        if len(set(p_str)) < len(p_str) // 2:
+            return False
+        
+        # Check binary properties
+        binary = bin(p)[2:]
+        # Avoid numbers that are too "regular" in binary
+        if binary.count('1') < 3 or binary.count('0') < 3:
+            return False
+        
+        return True
+    
+    def is_prime(self, n: int) -> bool:
+        """Fast primality test for Mersenne exponent candidates"""
+        if n < 2:
+            return False
+        if n == 2:
+            return True
+        if n % 2 == 0:
+            return False
+        if n < 9:
+            return True
+        if n % 3 == 0:
+            return False
+        
+        # Miller-Rabin test with optimal bases
+        d = n - 1
+        r = 0
+        while d % 2 == 0:
+            d //= 2
+            r += 1
+        
+        # Use deterministic bases for different ranges
+        if n < 1373653:
+            bases = [2, 3]
+        elif n < 9080191:
+            bases = [31, 73]
+        elif n < 4759123141:
+            bases = [2, 7, 61]
+        else:
+            bases = [2, 3, 5, 7, 11, 13, 17]
+        
+        for a in bases:
+            if a >= n:
+                continue
+            
+            x = pow(a, d, n)
+            if x == 1 or x == n - 1:
+                continue
+            
+            for _ in range(r - 1):
+                x = pow(x, 2, n)
+                if x == n - 1:
+                    break
+            else:
+                return False
+        
+        return True
+    
     def generate_candidates_after_52nd(self, start: int, end: int, count: int = 1000) -> List[int]:
-        """Generate candidates ONLY after the 52nd Mersenne prime (82589933)"""
+        """Generate VALID Mersenne exponent candidates ONLY after the 52nd Mersenne prime (82589933)"""
         # Ensure we only search after the 52nd known Mersenne prime
         effective_start = max(start, self.last_known_exponent + 1)
         
@@ -110,56 +199,77 @@ class EnhancedMersenneDiscovery:
             print(f"⚠️ No candidates possible: start ({start:,}) must be > last known Mersenne prime ({self.last_known_exponent:,})")
             return []
         
-        print(f"🧠 Generating candidates after 52nd Mersenne prime...")
+        print(f"🧠 Generating VALID Mersenne exponent candidates after 52nd Mersenne prime...")
         print(f"📊 Searching range: {effective_start:,} to {end:,}")
+        print(f"🔍 Applying mathematical property filters...")
         
         candidates = []
         weights = self.pattern_weights
         
-        # Strategy 1: Exponential progression based on known growth
+        # Strategy 1: Exponential progression with filtering
         if weights["exponential"] > 0.5:
             current = effective_start
             while current < end and len(candidates) < count // 3:
                 next_candidate = int(current * (1 + weights["exponential"] * 0.1))
                 if next_candidate > current and next_candidate < end:
-                    candidates.append(next_candidate)
+                    if self.is_valid_mersenne_exponent_candidate(next_candidate):
+                        candidates.append(next_candidate)
                     current = next_candidate
                 else:
-                    current += 1
+                    current += 2  # Skip even numbers
         
-        # Strategy 2: Gap-based prediction
+        # Strategy 2: Gap-based prediction with filtering
         if weights["avg_gap"] > 0:
             predicted = self.last_known_exponent + int(weights["avg_gap"])
             while predicted < end and len(candidates) < count // 3:
-                if predicted > effective_start:
+                if predicted > effective_start and self.is_valid_mersenne_exponent_candidate(predicted):
                     candidates.append(predicted)
                 predicted += int(weights["avg_gap"] * 1.1)
         
-        # Strategy 3: Modulo pattern analysis
+        # Strategy 3: Modulo pattern analysis with filtering
         if "mod_patterns" in weights:
             common_mods = sorted(weights["mod_patterns"].items(), key=lambda x: x[1], reverse=True)
             for mod, freq in common_mods[:3]:
                 current = effective_start - (effective_start % 210) + mod
                 while current < end and len(candidates) < count // 6:
-                    if current > effective_start:
+                    if current > effective_start and self.is_valid_mersenne_exponent_candidate(current):
                         candidates.append(current)
                     current += 210
         
-        # Strategy 4: Random sampling in promising ranges
+        # Strategy 4: Smart random sampling with filtering
         remaining = count - len(candidates)
         if remaining > 0:
             import random
             random.seed(42)
-            for _ in range(remaining):
+            attempts = 0
+            max_attempts = remaining * 10  # Prevent infinite loops
+            
+            while len(candidates) < count and attempts < max_attempts:
+                # Generate odd numbers only
                 candidate = random.randint(effective_start, end)
-                if candidate not in candidates:
+                if candidate % 2 == 0:
+                    candidate += 1
+                
+                if (candidate not in candidates and 
+                    candidate <= end and 
+                    self.is_valid_mersenne_exponent_candidate(candidate)):
                     candidates.append(candidate)
+                
+                attempts += 1
         
         # Remove duplicates and sort
         candidates = sorted(list(set(candidates)))
         final_candidates = candidates[:count]
         
-        print(f"✅ Generated {len(final_candidates)} candidates (all > {self.last_known_exponent:,})")
+        print(f"✅ Generated {len(final_candidates)} VALID candidates (all > {self.last_known_exponent:,})")
+        print(f"🔍 All candidates are odd primes with proper Mersenne exponent properties")
+        
+        # Show sample of generated candidates
+        if final_candidates:
+            print(f"📋 Sample candidates: {final_candidates[:5]}")
+            print(f"   Last digits: {[str(c)[-2:] for c in final_candidates[:5]]}")
+            print(f"   Binary lengths: {[len(bin(c)[2:]) for c in final_candidates[:5]]}")
+        
         return final_candidates
     
     def lucas_lehmer_test(self, p: int, timeout: float = 30.0) -> Tuple[bool, float]:

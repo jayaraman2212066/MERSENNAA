@@ -27,6 +27,81 @@ class AdvancedCandidateGenerator:
         print(f"🧠 Advanced Candidate Generator initialized")
         print(f"📊 Analyzed {len(self.known_mersenne_primes)} known Mersenne primes")
     
+    def is_valid_mersenne_exponent_candidate(self, p: int) -> bool:
+        """Check if a number is a valid Mersenne exponent candidate based on mathematical properties"""
+        # Must be > 52nd Mersenne prime
+        if p <= max(self.known_mersenne_primes):
+            return False
+        
+        # Must be odd (except 2, but we're after 52nd)
+        if p % 2 == 0:
+            return False
+        
+        # Must be prime
+        if not self.is_prime(p):
+            return False
+        
+        # Modulo 4: must be ≡ 1 or 3 (all odd primes)
+        if p % 4 not in [1, 3]:
+            return False
+        
+        # Modulo 6: must be ≡ 1 or 5 (all primes > 3)
+        if p > 3 and p % 6 not in [1, 5]:
+            return False
+        
+        # Last digit: must end in 1, 3, 7, or 9 (except 2, 5)
+        if p > 5 and p % 10 not in [1, 3, 7, 9]:
+            return False
+        
+        return True
+    
+    def is_prime(self, n: int) -> bool:
+        """Fast primality test for Mersenne exponent candidates"""
+        if n < 2:
+            return False
+        if n == 2:
+            return True
+        if n % 2 == 0:
+            return False
+        if n < 9:
+            return True
+        if n % 3 == 0:
+            return False
+        
+        # Miller-Rabin test with optimal bases
+        d = n - 1
+        r = 0
+        while d % 2 == 0:
+            d //= 2
+            r += 1
+        
+        # Use deterministic bases for different ranges
+        if n < 1373653:
+            bases = [2, 3]
+        elif n < 9080191:
+            bases = [31, 73]
+        elif n < 4759123141:
+            bases = [2, 7, 61]
+        else:
+            bases = [2, 3, 5, 7, 11, 13, 17]
+        
+        for a in bases:
+            if a >= n:
+                continue
+            
+            x = pow(a, d, n)
+            if x == 1 or x == n - 1:
+                continue
+            
+            for _ in range(r - 1):
+                x = pow(x, 2, n)
+                if x == n - 1:
+                    break
+            else:
+                return False
+        
+        return True
+    
     def _analyze_patterns(self) -> Dict:
         """Comprehensive pattern analysis of known Mersenne primes"""
         if len(self.known_mersenne_primes) < 5:
@@ -125,13 +200,14 @@ class AdvancedCandidateGenerator:
         return patterns
     
     def generate_candidates_exponential(self, start: int, end: int, count: int) -> List[int]:
-        """Generate candidates using exponential growth pattern"""
+        """Generate VALID candidates using exponential growth pattern"""
         candidates = []
         growth_rate = self.patterns["growth"]["mean_rate"]
         
         current = start
         while current < end and len(candidates) < count:
-            candidates.append(current)
+            if self.is_valid_mersenne_exponent_candidate(current):
+                candidates.append(current)
             # Use exponential growth with some randomness
             increment = int(current * growth_rate * (0.8 + 0.4 * np.random.random()))
             current += max(1, increment)
@@ -139,14 +215,15 @@ class AdvancedCandidateGenerator:
         return candidates
     
     def generate_candidates_gap_based(self, start: int, end: int, count: int) -> List[int]:
-        """Generate candidates based on gap analysis"""
+        """Generate VALID candidates based on gap analysis"""
         candidates = []
         gap_mean = self.patterns["gaps"]["mean"]
         gap_std = self.patterns["gaps"]["std"]
         
         current = start
         while current < end and len(candidates) < count:
-            candidates.append(current)
+            if self.is_valid_mersenne_exponent_candidate(current):
+                candidates.append(current)
             # Use gap distribution with some variation
             gap = int(gap_mean + np.random.normal(0, gap_std * 0.5))
             current += max(1, gap)
@@ -154,7 +231,7 @@ class AdvancedCandidateGenerator:
         return candidates
     
     def generate_candidates_modulo(self, start: int, end: int, count: int) -> List[int]:
-        """Generate candidates using modulo pattern analysis"""
+        """Generate VALID candidates using modulo pattern analysis"""
         candidates = []
         preferred_mod_210 = self.patterns["modulo"]["preferred_mod_210"]
         preferred_mod_30 = self.patterns["modulo"]["preferred_mod_30"]
@@ -165,13 +242,14 @@ class AdvancedCandidateGenerator:
             current += 210
         
         while current < end and len(candidates) < count:
-            candidates.append(current)
+            if self.is_valid_mersenne_exponent_candidate(current):
+                candidates.append(current)
             current += 210  # Step by 210 to maintain modulo pattern
         
         return candidates
     
     def generate_candidates_density_weighted(self, start: int, end: int, count: int) -> List[int]:
-        """Generate candidates weighted by historical density"""
+        """Generate VALID candidates weighted by historical density"""
         candidates = []
         
         # Create density map
@@ -186,14 +264,16 @@ class AdvancedCandidateGenerator:
         if density_map:
             max_density = max(density_map.values())
             for candidate in range(start, end):
-                weight = density_map.get(candidate, 0.1) / max_density
-                if np.random.random() < weight and len(candidates) < count:
-                    candidates.append(candidate)
+                if (self.is_valid_mersenne_exponent_candidate(candidate) and 
+                    len(candidates) < count):
+                    weight = density_map.get(candidate, 0.1) / max_density
+                    if np.random.random() < weight:
+                        candidates.append(candidate)
         
         return candidates
     
     def generate_candidates_twin_focused(self, start: int, end: int, count: int) -> List[int]:
-        """Generate candidates focusing on potential twin Mersenne exponents"""
+        """Generate VALID candidates focusing on potential twin Mersenne exponents"""
         candidates = []
         twin_rate = self.patterns["twins"]["twin_rate"]
         
@@ -203,8 +283,9 @@ class AdvancedCandidateGenerator:
                 break
             
             # Check if candidate-2 or candidate+2 is a known Mersenne prime
-            if (candidate - 2 in self.known_mersenne_primes or 
-                candidate + 2 in self.known_mersenne_primes):
+            if ((candidate - 2 in self.known_mersenne_primes or 
+                 candidate + 2 in self.known_mersenne_primes) and
+                self.is_valid_mersenne_exponent_candidate(candidate)):
                 candidates.append(candidate)
         
         return candidates
