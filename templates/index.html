@@ -504,6 +504,8 @@
                     <div class="demo-controls">
                         <button class="demo-btn" onclick="viewResearchPaper()">📖 View Research Paper</button>
                         <button class="demo-btn" onclick="downloadResearchPaper()">📥 Download PDF</button>
+                        <button class="demo-btn" onclick="viewResearchAnalysis()">📖 View Research Analysis</button>
+                        <button class="demo-btn" onclick="downloadResearchAnalysis()">📥 Download Analysis</button>
                         <a class="demo-btn" href="/proofs/benchmark_chart.png" target="_blank">📈 View Benchmark Chart</a>
                     </div>
                     
@@ -1117,6 +1119,16 @@
             const link = document.createElement('a');
             link.href = '/download-research';
             link.download = 'MERSENNE_Research_Paper.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function viewResearchAnalysis(){ window.open('/research-analysis', '_blank'); }
+        function downloadResearchAnalysis(){
+            const link = document.createElement('a');
+            link.href = '/download-research-analysis';
+            link.download = 'MERSENNE_Research_Analysis.pdf';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

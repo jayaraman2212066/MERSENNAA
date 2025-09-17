@@ -367,6 +367,24 @@ def download_research():
     except FileNotFoundError:
         return jsonify({"error": "Research paper not found"}), 404
 
+# New: Serve the formal research analysis paper
+@app.route('/research-analysis')
+def research_analysis():
+    """Serve the formal research_analysis.pdf inline"""
+    try:
+        return send_from_directory('.', 'research_analysis.pdf', as_attachment=False)
+    except FileNotFoundError:
+        return jsonify({"error": "Research analysis not found"}), 404
+
+@app.route('/download-research-analysis')
+def download_research_analysis():
+    """Download the formal research_analysis.pdf"""
+    try:
+        return send_from_directory('.', 'research_analysis.pdf', as_attachment=True,
+                                   download_name='MERSENNE_Research_Analysis.pdf')
+    except FileNotFoundError:
+        return jsonify({"error": "Research analysis not found"}), 404
+
 @app.route('/proofs/<path:filename>')
 def serve_proof(filename):
     """Serve proof artifacts like benchmark_chart.png and JSON."""
