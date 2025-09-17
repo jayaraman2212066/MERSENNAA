@@ -461,8 +461,8 @@
                 </div>
 
                 <div class="interactive-demo">
-                    <h3>🚀 Revolutionary Mersenne Discovery (Unlimited)</h3>
-                    <p>Run real Mersenne prime discovery with advanced pattern analysis and multi-threading!</p>
+                    <h3>🚀 Enhanced Mersenne Discovery (Sequential + Prime95)</h3>
+                    <p>Sequential discovery after 52nd Mersenne prime with Prime95 verification!</p>
                     
                     <div class="demo-controls">
                         <input id="discovery-start" type="number" min="2" placeholder="Start range (e.g., 85000000)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:180px;" value="85000000">
@@ -482,12 +482,12 @@
                     </div>
                     
                     <div id="discovery-status" class="demo-output" style="min-height: 200px;">
-                        <strong>🚀 Revolutionary Discovery System Ready!</strong><br>
-                        • Enter search range (no upper limit)<br>
-                        • Set max candidates to test<br>
-                        • Choose number of worker threads<br>
-                        • Click "Start Discovery" to begin real Mersenne prime search<br><br>
-                        <em>This uses advanced pattern analysis and multi-threaded Lucas-Lehmer testing!</em>
+                        <strong>🚀 Enhanced Discovery System Ready!</strong><br>
+                        • Only searches after 52nd Mersenne prime (82589933)<br>
+                        • Sequential testing (one candidate at a time)<br>
+                        • Each discovery sent to Prime95 for verification<br>
+                        • Advanced pattern analysis for candidate generation<br><br>
+                        <em>This ensures we only find NEW Mersenne primes and verify them with Prime95!</em>
                     </div>
                 </div>
             </div>
@@ -828,7 +828,8 @@
                     if (discoveries.length > 0) {
                         statusText += '<strong>🌟 Recent Discoveries:</strong><br>';
                         discoveries.slice(-3).forEach((disc, i) => {
-                            statusText += `  #${discoveries.length - discoveries.slice(-3).length + i + 1}: p = ${disc.exponent.toLocaleString()} (${disc.test_time.toFixed(4)}s)<br>`;
+                            const verified = disc.verified_by_prime95 ? '✅ VERIFIED' : '⏳ PENDING';
+                            statusText += `  #${discoveries.length - discoveries.slice(-3).length + i + 1}: p = ${disc.exponent.toLocaleString()} (${disc.test_time.toFixed(4)}s) ${verified}<br>`;
                         });
                     }
 
@@ -848,10 +849,13 @@
                     `;
 
                     if (discoveries.length > 0) {
+                        const verified = discoveries.filter(d => d.verified_by_prime95).length;
                         finalText += '<strong>🌟 All Discoveries:</strong><br>';
                         discoveries.forEach((disc, i) => {
-                            finalText += `  #${i + 1}: p = ${disc.exponent.toLocaleString()} → 2^${disc.exponent} - 1<br>`;
+                            const status = disc.verified_by_prime95 ? '✅ VERIFIED' : '⏳ PENDING';
+                            finalText += `  #${i + 1}: p = ${disc.exponent.toLocaleString()} → 2^${disc.exponent} - 1 (${status})<br>`;
                         });
+                        finalText += `<br><strong>📊 Summary: ${verified}/${discoveries.length} verified by Prime95</strong>`;
                     } else {
                         finalText += '<em>No new Mersenne primes found in this range.</em><br>';
                         finalText += 'Try expanding the range or increasing candidate count.';

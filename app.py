@@ -29,6 +29,7 @@ except ImportError:
 try:
     from revolutionary_mersenne_discovery import RevolutionaryMersenneDiscovery
     from advanced_candidate_generator import AdvancedCandidateGenerator
+    from enhanced_mersenne_discovery import EnhancedMersenneDiscovery
     DISCOVERY_AVAILABLE = True
 except ImportError:
     DISCOVERY_AVAILABLE = False
@@ -446,8 +447,8 @@ def start_discovery():
         if workers < 1 or workers > 16:
             return jsonify({"error": "Workers must be between 1 and 16"}), 400
         
-        # Initialize discovery engine
-        discovery_state["engine"] = RevolutionaryMersenneDiscovery()
+        # Initialize enhanced discovery engine (sequential with Prime95 verification)
+        discovery_state["engine"] = EnhancedMersenneDiscovery()
         discovery_state["engine"].config["optimization_settings"]["max_workers"] = workers
         discovery_state["start_time"] = time.time()
         discovery_state["running"] = True
@@ -457,10 +458,10 @@ def start_discovery():
         discovery_state["test_rate"] = 0.0
         discovery_state["threads_active"] = 0
         
-        # Start discovery in background thread
+        # Start enhanced sequential discovery in background thread
         def run_discovery():
             try:
-                discoveries = discovery_state["engine"].run_discovery(start_range, end_range, max_candidates)
+                discoveries = discovery_state["engine"].run_sequential_discovery(start_range, end_range, max_candidates)
                 discovery_state["discoveries"] = discoveries
             except Exception as e:
                 print(f"Discovery error: {e}")
