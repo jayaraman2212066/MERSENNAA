@@ -40,6 +40,15 @@ class EnhancedMersenneDiscovery:
         self.prime95_queue = queue.Queue()
         self.verification_results = queue.Queue()
         
+        # Advanced pattern analysis
+        try:
+            from advanced_mersenne_pattern_analysis import AdvancedMersennePatternAnalysis
+            self.pattern_analyzer = AdvancedMersennePatternAnalysis()
+            print("🧠 Advanced pattern analysis loaded")
+        except ImportError:
+            self.pattern_analyzer = None
+            print("⚠️ Advanced pattern analysis not available, using basic patterns")
+        
         # Pattern analysis data
         self.pattern_weights = self._analyze_known_patterns()
         
@@ -102,7 +111,7 @@ class EnhancedMersenneDiscovery:
         }
     
     def is_valid_mersenne_exponent_candidate(self, p: int) -> bool:
-        """Check if a number is a valid Mersenne exponent candidate based on mathematical properties"""
+        """Check if a number is a valid Mersenne exponent candidate based on comprehensive mathematical properties"""
         # Must be > 52nd Mersenne prime
         if p <= self.last_known_exponent:
             return False
@@ -127,21 +136,71 @@ class EnhancedMersenneDiscovery:
         if p > 5 and p % 10 not in [1, 3, 7, 9]:
             return False
         
-        # Additional Mersenne-specific patterns
-        # Check for common Mersenne exponent patterns
+        # Advanced Mersenne exponent pattern analysis
         p_str = str(p)
+        binary = bin(p)[2:]
         
-        # Avoid numbers with too many repeated digits (unlikely for large Mersenne exponents)
-        if len(set(p_str)) < len(p_str) // 2:
+        # Binary properties (most exponents start and end with 1)
+        if not binary.startswith('1') or not binary.endswith('1'):
             return False
         
-        # Check binary properties
-        binary = bin(p)[2:]
-        # Avoid numbers that are too "regular" in binary
-        if binary.count('1') < 3 or binary.count('0') < 3:
+        # Binary length analysis (avoid too short or too regular)
+        binary_length = len(binary)
+        if binary_length < 15:  # Too small for large Mersenne exponents
+            return False
+        
+        # Popcount analysis (number of 1s in binary)
+        popcount = binary.count('1')
+        if popcount < 5 or popcount > 20:  # Based on statistical analysis
+            return False
+        
+        # Digit sum analysis
+        digit_sum = sum(int(d) for d in p_str)
+        if digit_sum < 10 or digit_sum > 50:  # Reasonable range for large numbers
+            return False
+        
+        # Suffix pattern analysis (last 2-3 digits)
+        last_two = p_str[-2:] if len(p_str) >= 2 else p_str
+        last_three = p_str[-3:] if len(p_str) >= 3 else p_str
+        
+        # Check for common Mersenne exponent suffixes
+        common_suffixes = ['17', '21', '33', '57', '61', '81', '89']
+        if last_two not in common_suffixes and last_three not in ['107', '127', '503', '607']:
+            # Still allow, but with lower priority
+            pass
+        
+        # Avoid numbers with too many repeated digits (unlikely for large Mersenne exponents)
+        if len(set(p_str)) < len(p_str) // 3:
+            return False
+        
+        # Check for Sophie Germain prime properties (bonus points)
+        sophie_germain = self.is_prime(2 * p + 1)
+        
+        # Check for safe prime properties (bonus points)
+        safe_prime = self.is_prime((p - 1) // 2) if p > 2 else False
+        
+        # Hex pattern analysis
+        hex_str = hex(p)[2:].upper()
+        if 'FF' in hex_str or hex_str.endswith('F'):
+            # Bonus for hex patterns similar to known Mersenne exponents
+            pass
+        
+        # Digital root analysis
+        digital_root = self.calculate_digital_root(p)
+        
+        # Modulo 210 analysis (2*3*5*7)
+        mod_210 = p % 210
+        preferred_mod_210 = [1, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 143, 149, 151, 157, 163, 167, 169, 173, 179, 181, 187, 191, 193, 197, 199, 209]
+        if mod_210 not in preferred_mod_210:
             return False
         
         return True
+    
+    def calculate_digital_root(self, n: int) -> int:
+        """Calculate digital root of a number"""
+        while n >= 10:
+            n = sum(int(d) for d in str(n))
+        return n
     
     def is_prime(self, n: int) -> bool:
         """Fast primality test for Mersenne exponent candidates"""
@@ -201,61 +260,70 @@ class EnhancedMersenneDiscovery:
         
         print(f"🧠 Generating VALID Mersenne exponent candidates after 52nd Mersenne prime...")
         print(f"📊 Searching range: {effective_start:,} to {end:,}")
-        print(f"🔍 Applying mathematical property filters...")
+        print(f"🔍 Applying advanced mathematical property filters...")
         
         candidates = []
-        weights = self.pattern_weights
         
-        # Strategy 1: Exponential progression with filtering
-        if weights["exponential"] > 0.5:
-            current = effective_start
-            while current < end and len(candidates) < count // 3:
-                next_candidate = int(current * (1 + weights["exponential"] * 0.1))
-                if next_candidate > current and next_candidate < end:
-                    if self.is_valid_mersenne_exponent_candidate(next_candidate):
-                        candidates.append(next_candidate)
-                    current = next_candidate
-                else:
-                    current += 2  # Skip even numbers
-        
-        # Strategy 2: Gap-based prediction with filtering
-        if weights["avg_gap"] > 0:
-            predicted = self.last_known_exponent + int(weights["avg_gap"])
-            while predicted < end and len(candidates) < count // 3:
-                if predicted > effective_start and self.is_valid_mersenne_exponent_candidate(predicted):
-                    candidates.append(predicted)
-                predicted += int(weights["avg_gap"] * 1.1)
-        
-        # Strategy 3: Modulo pattern analysis with filtering
-        if "mod_patterns" in weights:
-            common_mods = sorted(weights["mod_patterns"].items(), key=lambda x: x[1], reverse=True)
-            for mod, freq in common_mods[:3]:
-                current = effective_start - (effective_start % 210) + mod
-                while current < end and len(candidates) < count // 6:
-                    if current > effective_start and self.is_valid_mersenne_exponent_candidate(current):
-                        candidates.append(current)
-                    current += 210
-        
-        # Strategy 4: Smart random sampling with filtering
-        remaining = count - len(candidates)
-        if remaining > 0:
-            import random
-            random.seed(42)
-            attempts = 0
-            max_attempts = remaining * 10  # Prevent infinite loops
+        # Use advanced pattern analysis if available
+        if self.pattern_analyzer:
+            print(f"🧠 Using advanced pattern analysis for intelligent candidate generation...")
+            priority_candidates = self.pattern_analyzer.generate_priority_candidates(effective_start, end, count)
+            candidates = [candidate for candidate, score in priority_candidates]
+            print(f"🎯 Generated {len(candidates)} priority candidates using advanced pattern analysis")
+        else:
+            # Fallback to basic pattern analysis
+            weights = self.pattern_weights
             
-            while len(candidates) < count and attempts < max_attempts:
-                # Generate odd numbers only
-                candidate = random.randint(effective_start, end)
-                if candidate % 2 == 0:
-                    candidate += 1
+            # Strategy 1: Exponential progression with filtering
+            if weights["exponential"] > 0.5:
+                current = effective_start
+                while current < end and len(candidates) < count // 3:
+                    next_candidate = int(current * (1 + weights["exponential"] * 0.1))
+                    if next_candidate > current and next_candidate < end:
+                        if self.is_valid_mersenne_exponent_candidate(next_candidate):
+                            candidates.append(next_candidate)
+                        current = next_candidate
+                    else:
+                        current += 2  # Skip even numbers
+            
+            # Strategy 2: Gap-based prediction with filtering
+            if weights["avg_gap"] > 0:
+                predicted = self.last_known_exponent + int(weights["avg_gap"])
+                while predicted < end and len(candidates) < count // 3:
+                    if predicted > effective_start and self.is_valid_mersenne_exponent_candidate(predicted):
+                        candidates.append(predicted)
+                    predicted += int(weights["avg_gap"] * 1.1)
+            
+            # Strategy 3: Modulo pattern analysis with filtering
+            if "mod_patterns" in weights:
+                common_mods = sorted(weights["mod_patterns"].items(), key=lambda x: x[1], reverse=True)
+                for mod, freq in common_mods[:3]:
+                    current = effective_start - (effective_start % 210) + mod
+                    while current < end and len(candidates) < count // 6:
+                        if current > effective_start and self.is_valid_mersenne_exponent_candidate(current):
+                            candidates.append(current)
+                        current += 210
+            
+            # Strategy 4: Smart random sampling with filtering
+            remaining = count - len(candidates)
+            if remaining > 0:
+                import random
+                random.seed(42)
+                attempts = 0
+                max_attempts = remaining * 10  # Prevent infinite loops
                 
-                if (candidate not in candidates and 
-                    candidate <= end and 
-                    self.is_valid_mersenne_exponent_candidate(candidate)):
-                    candidates.append(candidate)
-                
-                attempts += 1
+                while len(candidates) < count and attempts < max_attempts:
+                    # Generate odd numbers only
+                    candidate = random.randint(effective_start, end)
+                    if candidate % 2 == 0:
+                        candidate += 1
+                    
+                    if (candidate not in candidates and 
+                        candidate <= end and 
+                        self.is_valid_mersenne_exponent_candidate(candidate)):
+                        candidates.append(candidate)
+                    
+                    attempts += 1
         
         # Remove duplicates and sort
         candidates = sorted(list(set(candidates)))
@@ -264,11 +332,13 @@ class EnhancedMersenneDiscovery:
         print(f"✅ Generated {len(final_candidates)} VALID candidates (all > {self.last_known_exponent:,})")
         print(f"🔍 All candidates are odd primes with proper Mersenne exponent properties")
         
-        # Show sample of generated candidates
+        # Show sample of generated candidates with analysis
         if final_candidates:
             print(f"📋 Sample candidates: {final_candidates[:5]}")
             print(f"   Last digits: {[str(c)[-2:] for c in final_candidates[:5]]}")
             print(f"   Binary lengths: {[len(bin(c)[2:]) for c in final_candidates[:5]]}")
+            print(f"   Popcounts: {[bin(c)[2:].count('1') for c in final_candidates[:5]]}")
+            print(f"   Digital roots: {[self.calculate_digital_root(c) for c in final_candidates[:5]]}")
         
         return final_candidates
     

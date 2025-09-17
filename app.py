@@ -30,6 +30,7 @@ try:
     from revolutionary_mersenne_discovery import RevolutionaryMersenneDiscovery
     from advanced_candidate_generator import AdvancedCandidateGenerator
     from enhanced_mersenne_discovery import EnhancedMersenneDiscovery
+    from advanced_mersenne_pattern_analysis import AdvancedMersennePatternAnalysis
     DISCOVERY_AVAILABLE = True
 except ImportError:
     DISCOVERY_AVAILABLE = False
