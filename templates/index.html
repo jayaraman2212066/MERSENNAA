@@ -448,15 +448,16 @@
                 </div>
 
                 <div class="interactive-demo">
-                    <h3>Algorithm Performance Simulation</h3>
+                    <h3>Real Algorithm Performance Test</h3>
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="startPerformanceSim()">Start Simulation</button>
-                        <button class="demo-btn" onclick="stopPerformanceSim()">Stop</button>
+                        <input id="perf-max-exp" type="number" min="2" max="1000" value="50" placeholder="Max exponent (2-1000)" style="padding:10px;border-radius:8px;border:1px solid #333;min-width:180px;">
+                        <button class="demo-btn" onclick="startRealPerformanceTest()">Run Real Test</button>
+                        <button class="demo-btn" onclick="stopPerformanceTest()">Stop</button>
                     </div>
                     <div class="progress-container">
                         <div id="performance-bar" class="progress-bar" style="width: 0%"></div>
                     </div>
-                    <p id="performance-text">Ready to simulate algorithm performance...</p>
+                    <div id="performance-results" class="demo-output" style="min-height: 120px;">Click "Run Real Test" to test actual Mersenne prime performance...</div>
                 </div>
             </div>
         </div>
@@ -623,19 +624,83 @@
             `;
         }
 
-        // Performance Simulation (UI animation only)
-        let performanceInterval; let currentProgress = 0;
-        function startPerformanceSim() {
-            currentProgress = 0; const bar = document.getElementById('performance-bar'); const text = document.getElementById('performance-text');
-            clearInterval(performanceInterval);
-            performanceInterval = setInterval(() => {
-                currentProgress += Math.random() * 15; if (currentProgress > 100) currentProgress = 100;
-                bar.style.width = currentProgress + '%';
-                text.innerHTML = `Algorithm Performance: ${Math.round(currentProgress)}%`;
-                if (currentProgress >= 100) { clearInterval(performanceInterval); text.innerHTML = 'Performance simulation completed!'; }
-            }, 200);
+        // Real Performance Test
+        let performanceInterval; let currentProgress = 0; let isRunning = false;
+        async function startRealPerformanceTest() {
+            if (isRunning) return;
+            isRunning = true;
+            currentProgress = 0;
+            const bar = document.getElementById('performance-bar');
+            const results = document.getElementById('performance-results');
+            const maxExp = parseInt(document.getElementById('perf-max-exp').value) || 50;
+            
+            if (maxExp < 2 || maxExp > 1000) {
+                results.innerHTML = 'Enter a valid max exponent between 2 and 1000';
+                isRunning = false;
+                return;
+            }
+            
+            results.innerHTML = 'Starting real performance test...';
+            bar.style.width = '0%';
+            
+            try {
+                const response = await fetch('/api/performance_test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ max_exponent: maxExp })
+                });
+                const data = await response.json();
+                
+                if (data.error) {
+                    results.innerHTML = `Error: ${data.error}`;
+                    isRunning = false;
+                    return;
+                }
+                
+                // Animate progress bar
+                clearInterval(performanceInterval);
+                performanceInterval = setInterval(() => {
+                    currentProgress += 2;
+                    if (currentProgress > 100) currentProgress = 100;
+                    bar.style.width = currentProgress + '%';
+                    if (currentProgress >= 100) {
+                        clearInterval(performanceInterval);
+                        showPerformanceResults(data);
+                        isRunning = false;
+                    }
+                }, 50);
+                
+            } catch (e) {
+                results.innerHTML = `Failed to run test: ${e.message}`;
+                isRunning = false;
+            }
         }
-        function stopPerformanceSim() { clearInterval(performanceInterval); document.getElementById('performance-text').innerHTML = 'Performance simulation stopped.'; }
+        
+        function showPerformanceResults(data) {
+            const results = document.getElementById('performance-results');
+            const avgTime = data.average_time || 0;
+            const totalTime = data.total_time || 0;
+            const tested = data.total_tested || 0;
+            
+            results.innerHTML = `
+                <strong>Real Performance Test Results:</strong><br>
+                <strong>Exponents tested:</strong> ${tested}<br>
+                <strong>Total time:</strong> ${totalTime}s<br>
+                <strong>Average time per test:</strong> ${avgTime}s<br>
+                <strong>Tests per second:</strong> ${tested > 0 ? (1/avgTime).toFixed(2) : 'N/A'}<br><br>
+                <strong>Sample results:</strong><br>
+                ${data.results.slice(0, 5).map(r => 
+                    `p=${r.exponent}: ${r.is_prime ? 'Prime ✅' : 'Not prime ❌'} (${r.computation_time}s)`
+                ).join('<br>')}
+                ${data.results.length > 5 ? '<br>...' : ''}
+            `;
+        }
+        
+        function stopPerformanceTest() {
+            clearInterval(performanceInterval);
+            isRunning = false;
+            document.getElementById('performance-results').innerHTML = 'Performance test stopped.';
+        }
 
         // Typing effect
         function typeWriter(element, text, speed = 100) { let i = 0; element.innerHTML = ''; (function type(){ if (i < text.length) { element.innerHTML += text.charAt(i++); setTimeout(type, speed);} })(); }
