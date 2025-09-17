@@ -154,8 +154,70 @@ def create_analysis_pdf():
 		story.append(Paragraph(f"• {bullet}", body_style))
 	story.append(PageBreak())
 
+	# Candidate generation efficiency section (measured on the fly for a small window)
+	story.append(Paragraph("5. Candidate Generation: Computational Time & Efficiency", heading_style))
+	story.append(Paragraph("We measure how fast the Python candidate generator filters a small range to valid exponents, reporting rate and reduction percentage. This is a representative micro-benchmark; production runs typically use C++ and larger ranges.", body_style))
+	try:
+		import time
+		start_p = 136279841 + 1
+		end_p = start_p + 100000  # 100k window for quick profiling
+		count_cap = 2000
+		before = time.time()
+		# Lightweight inline candidate generation mirroring project filters
+		def _is_prime(n:int)->bool:
+			if n < 2: return False
+			if n % 2 == 0: return n == 2
+			if n % 3 == 0: return n == 3
+			d = n - 1; r = 0
+			while d % 2 == 0:
+				d //= 2; r += 1
+			for a in (2, 3, 5, 7, 11):
+				if a >= n: continue
+				x = pow(a, d, n)
+				if x == 1 or x == n - 1: continue
+				ok = False
+				for _ in range(r - 1):
+					x = (x * x) % n
+					if x == n - 1: ok = True; break
+				if not ok: return False
+			return True
+		candidates = []
+		checked = 0
+		for p in range(start_p | 1, end_p, 2):
+			checked += 1
+			m210 = p % 210
+			if (m210 % 2 == 0 or m210 % 3 == 0 or m210 % 5 == 0 or m210 % 7 == 0):
+				continue
+			if p % 10 not in (1,3,7,9):
+				continue
+			if not _is_prime(p):
+				continue
+			candidates.append(p)
+			if len(candidates) >= count_cap:
+				break
+		dur = time.time() - before
+		rate = checked / dur if dur > 0 else 0
+		reduction = 1.0 - (len(candidates) / max(1, checked))
+		rows = [["Metric", "Value"],
+			["Range width (p)", f"{end_p-start_p:,}"],
+			["Numbers screened", f"{checked:,}"],
+			["Valid candidates", f"{len(candidates):,}"],
+			["Screening time (s)", f"{dur:.3f}"],
+			["Screening rate (/s)", f"{rate:,.0f}"],
+			["Reduction vs odd integers", f"{reduction*100:.2f}%"],]
+		tbl = Table(rows, hAlign='LEFT', colWidths=[220, 340])
+		tbl.setStyle(TableStyle([
+			('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+			('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+			('ALIGN', (0,0), (-1,-1), 'LEFT'),
+		]))
+		story.append(tbl)
+	except Exception:
+		story.append(Paragraph("Candidate generation micro-benchmark could not be executed in this environment.", body_style))
+	story.append(PageBreak())
+
 	# Web service showcase
-	story.append(Paragraph("5. Web Service & APIs", heading_style))
+	story.append(Paragraph("6. Web Service & APIs", heading_style))
 	story.append(Paragraph("The Flask web service exposes endpoints to test exponents, run analysis, collect performance, and view artifacts:", body_style))
 	api_rows = [["Endpoint", "Description"],
 		["GET /research-paper", "Inline research PDF"],
@@ -174,7 +236,7 @@ def create_analysis_pdf():
 	story.append(PageBreak())
 
 	# Key efficiency table
-	story.append(Paragraph("6. Key Efficiency Metrics", heading_style))
+	story.append(Paragraph("7. Key Efficiency Metrics", heading_style))
 	key_rows = [["Metric", "Value"],
 		["Frontier start (p)", "136,279,841 (52nd known)"],
 		["Candidate reduction", "> 99% vs naïve ranges"],
@@ -189,8 +251,49 @@ def create_analysis_pdf():
 	story.append(key_tbl)
 	story.append(PageBreak())
 
+	# Mathematical metrics and realistic scenarios
+	story.append(Paragraph("8. Mathematical Metrics & Realistic Scenarios", heading_style))
+	story.append(Paragraph("We summarize essential quantities relevant to Mersenne prime testing and provide realistic planning scenarios using measured data.", body_style))
+	from math import log10
+	def digits_of_mersenne(p:int)->int:
+		return int(p * log10(2)) + 1
+	p_latest = 136279841
+	digits = digits_of_mersenne(p_latest)
+	ll_iters = max(0, p_latest - 2)
+	metrics_rows = [["Quantity", "Value"],
+		["Latest known exponent (p)", f"{p_latest:,}"],
+		["Digits in 2^p−1", f"~{digits:,}"],
+		["LL iterations at p", f"{ll_iters:,}"],
+		["Per-iteration core op", "s_{i+1} = s_i^2 − 2 mod (2^p−1)"]]
+	metrics_tbl = Table(metrics_rows, hAlign='LEFT', colWidths=[220, 340])
+	metrics_tbl.setStyle(TableStyle([
+		('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+		('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+		('ALIGN', (0,0), (-1,-1), 'LEFT'),
+	]))
+	story.append(metrics_tbl)
+	story.append(Spacer(1, 12))
+
+	# Scenario table based on throughput computed earlier (if available)
+	story.append(Paragraph("Planning Scenarios (based on measured throughput)", subheading_style))
+	def fmt(v):
+		return f"{v:,.0f}" if isinstance(v,(int,float)) else v
+	N = tests_per_hour if tests_per_hour else 2400.0
+	scenarios = [["Target Candidates (C)", "Throughput (N/hr)", "ETA (days)"],
+		["10,000", fmt(N), f"{(10000.0/N)/24.0:.1f}"],
+		["100,000", fmt(N), f"{(100000.0/N)/24.0:.1f}"],
+		["1,000,000", fmt(N), f"{(1000000.0/N)/24.0:.1f}"],]
+	sc_tbl = Table(scenarios, hAlign='LEFT', colWidths=[160, 200, 200])
+	sc_tbl.setStyle(TableStyle([
+		('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+		('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+		('ALIGN', (0,0), (-1,-1), 'LEFT'),
+	]))
+	story.append(sc_tbl)
+	story.append(PageBreak())
+
 	# Keep the original benchmark proof section title for continuity
-	story.append(Paragraph("7. 📈 BENCHMARK PROOF (REAL DATA)", heading_style))
+	story.append(Paragraph("9. 📈 BENCHMARK PROOF (REAL DATA)", heading_style))
 	story.append(Paragraph("This section provides a real, reproducible benchmark captured from the backend /api/performance_test endpoint.", body_style))
 	
 	story.append(Spacer(1, 18))
