@@ -342,6 +342,23 @@ def status():
         "known_mersenne_count": len(calculator.known_mersenne_primes)
     })
 
+@app.route('/research-paper')
+def research_paper():
+    """Serve the comprehensive research paper PDF"""
+    try:
+        return send_from_directory('.', 'MERSENNE_PROJECT_ANALYSIS.pdf', as_attachment=False)
+    except FileNotFoundError:
+        return jsonify({"error": "Research paper not found"}), 404
+
+@app.route('/download-research')
+def download_research():
+    """Download the comprehensive research paper PDF"""
+    try:
+        return send_from_directory('.', 'MERSENNE_PROJECT_ANALYSIS.pdf', as_attachment=True, 
+                                 download_name='MERSENNE_Research_Paper.pdf')
+    except FileNotFoundError:
+        return jsonify({"error": "Research paper not found"}), 404
+
 # --- Progress reporting for live demo ---
 def _file_info(path: str):
     try:
