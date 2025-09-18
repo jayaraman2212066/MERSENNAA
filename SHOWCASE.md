@@ -94,34 +94,18 @@
 
 ---
 
-## **🎯 Why This Project Stands Out**
-
-### **For HR Teams:**
-1. **Intellectual Curiosity** - Self-motivated learning beyond academic requirements
-2. **Technical Depth** - Mastery of multiple programming languages and paradigms
-3. **Problem-Solving** - Tackling one of mathematics' most challenging problems
-4. **Persistence** - Long-term project commitment and completion
-5. **Innovation** - Creating novel solutions to complex computational challenges
-
-### **For Technical Teams:**
-1. **Algorithm Design** - Understanding of computational complexity
-2. **Performance Engineering** - Focus on optimization and efficiency
-3. **Mathematical Programming** - Ability to translate theory into code
-4. **System Architecture** - Well-organized, maintainable codebase
-5. **Cross-Platform Development** - Windows batch scripting and cross-compilation
-
 ---
 
 ## **🔗 Project Links**
 - **GitHub Repository**: [PERFECT_NO_PRIMALITY_TEST](https://github.com/jayaraman2212066/PERFECT_NO_PRIMALITY_TEST)
-- **Live Demo**: [Render.com Deployment](https://mersenne-discovery.onrender.com) - Real-time Mersenne prime discovery
+- **Live Demo**: [Render.com Deployment](https://mersenne-conflicts.onrender.com) - Real-time Mersenne prime discovery
 - **Documentation**: Comprehensive technical documentation
 - **Pattern Analysis**: Advanced mathematical property analysis
 - **Prime95 Integration**: Professional-grade verification system
 
 ---
 
-## **💡 What This Demonstrates About You**
+## **💡 What This Demonstrates About Me - Jayaraman K**
 
 ### **Technical Competence**
 - Advanced programming skills across multiple languages
