@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 MERSENNE: Advanced Mathematical Computing Project</title>
+    <title>MERSENNE: Advanced Mathematical Computing Project</title>
     <link rel="icon" href="/assets/images.jpg" type="image/jpeg">
     <link rel="apple-touch-icon" href="/assets/images.jpg">
     <meta property="og:image" content="/assets/images.jpg">
@@ -16,8 +16,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-            color: #ffffff;
+            background: #f8f9fa;
+            color: #333333;
             line-height: 1.6;
             overflow-x: hidden;
         }
@@ -32,31 +32,23 @@
         .header {
             text-align: center;
             padding: 60px 0;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
+            background: #ffffff;
+            border-radius: 12px;
             margin-bottom: 40px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .header h1 {
             font-size: 3.5rem;
             margin-bottom: 20px;
-            background: linear-gradient(45deg, #00d4ff, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5)); }
-            to { filter: drop-shadow(0 0 30px rgba(255, 107, 107, 0.5)); }
+            color: #2d3748;
+            font-weight: bold;
         }
 
         .header p {
             font-size: 1.3rem;
-            color: #b8c6db;
+            color: #4a5568;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -72,22 +64,24 @@
 
         .nav-btn {
             padding: 12px 24px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border: none;
-            border-radius: 25px;
-            color: white;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            color: #4a5568;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
         }
 
         .nav-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            background: #f7fafc;
+            border-color: #cbd5e0;
         }
 
         .nav-btn.active {
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            background: #3182ce;
+            color: white;
+            border-color: #3182ce;
         }
 
         /* Content Sections */
@@ -106,12 +100,12 @@
         }
 
         .section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
+            background: #ffffff;
+            border-radius: 12px;
             padding: 30px;
             margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
             transition: transform 0.3s ease;
         }
 
@@ -151,9 +145,9 @@
 
         .demo-btn {
             padding: 10px 20px;
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            background: #3182ce;
             border: none;
-            border-radius: 20px;
+            border-radius: 8px;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -161,32 +155,33 @@
         }
 
         .demo-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+            background: #2c5aa0;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(49, 130, 206, 0.3);
         }
 
         .demo-output {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
+            background: #f7fafc;
+            border-radius: 8px;
             padding: 15px;
             margin: 15px 0;
             font-family: 'Courier New', monospace;
-            color: #00ff88;
+            color: #2d3748;
+            border: 1px solid #e2e8f0;
             min-height: 100px;
-            border: 1px solid rgba(0, 255, 136, 0.3);
         }
 
         /* Progress Bars */
         .progress-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            background: #e2e8f0;
+            border-radius: 8px;
             padding: 3px;
             margin: 15px 0;
         }
 
         .progress-bar {
             height: 20px;
-            background: linear-gradient(90deg, #00d4ff, #ff6b6b);
+            background: #3182ce;
             border-radius: 8px;
             transition: width 2s ease;
             position: relative;
@@ -330,7 +325,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🚀 MERSENNE</h1>
+            <h1>MERSENNE</h1>
             <p>Advanced Mathematical Computing & Algorithm Optimization</p>
             <p><em>Discovering the Universe's Mathematical Secrets Through Code</em></p>
         </div>
@@ -341,10 +336,10 @@
             <button class="nav-btn" onclick="showSection('technical')">Technical Skills</button>
             <button class="nav-btn" onclick="showSection('demo')">Live Demo</button>
             <button class="nav-btn" onclick="showSection('achievements')">Achievements</button>
-            <button class="nav-btn" onclick="showSection('formulas')">🧮 Formulas</button>
+            <button class="nav-btn" onclick="showSection('formulas')">Formulas</button>
             <button class="nav-btn" onclick="openGallery()">Gallery</button>
             <button class="nav-btn" onclick="showSection('progress')">Progress</button>
-            <button class="nav-btn" onclick="viewResearchPaper()">📄 Research</button>
+            <button class="nav-btn" onclick="viewResearchPaper()">Research</button>
         </div>
 
         <!-- Overview Section -->
@@ -376,7 +371,7 @@
             </div>
 
             <div class="section">
-                <h2>🔬 What Are Mersenne Primes?</h2>
+                <h2>What Are Mersenne Primes?</h2>
                 <p><strong>Mersenne primes</strong> are prime numbers of the form 2^p - 1, where p is itself a prime number. They are among the rarest and most valuable numbers in mathematics.</p>
                 
                 <div class="interactive-demo">
@@ -468,7 +463,7 @@
                 </div>
 
                 <div class="interactive-demo">
-                    <h3>🚀 Enhanced Mersenne Discovery (Sequential + Prime95)</h3>
+                    <h3>Enhanced Mersenne Discovery (Sequential + Prime95)</h3>
                     <p>Sequential discovery after 52nd Mersenne prime with Prime95 verification!</p>
                     
                     <div class="demo-controls">
@@ -479,9 +474,9 @@
                     </div>
                     
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="startRevolutionaryDiscovery()">🚀 Start Discovery</button>
-                        <button class="demo-btn" onclick="stopRevolutionaryDiscovery()">⏹️ Stop</button>
-                        <button class="demo-btn" onclick="generateIntelligentCandidates()">🧠 Generate Candidates</button>
+                        <button class="demo-btn" onclick="startRevolutionaryDiscovery()">Start Discovery</button>
+                        <button class="demo-btn" onclick="stopRevolutionaryDiscovery()">Stop</button>
+                        <button class="demo-btn" onclick="generateIntelligentCandidates()">Generate Candidates</button>
                     </div>
                     
                     <div class="progress-container">
@@ -489,7 +484,7 @@
                     </div>
                     
                     <div id="discovery-status" class="demo-output" style="min-height: 200px;">
-                        <strong>🚀 Enhanced Discovery System Ready!</strong><br>
+                        <strong>Enhanced Discovery System Ready!</strong><br>
                         • Only searches after 52nd Mersenne prime (136279841)<br>
                         • Sequential testing (one candidate at a time)<br>
                         • Each discovery sent to Prime95 for verification<br>
@@ -499,19 +494,19 @@
                 </div>
 
                 <div class="interactive-demo">
-                    <h3>📄 Research Paper & Technical Analysis</h3>
+                    <h3>Research Paper & Technical Analysis</h3>
                     <p>Comprehensive technical analysis of our Mersenne prime discovery system!</p>
                     
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="viewResearchPaper()">📖 View Research Paper</button>
-                        <button class="demo-btn" onclick="downloadResearchPaper()">📥 Download PDF</button>
-                        <button class="demo-btn" onclick="viewResearchAnalysis()">📖 View Research Analysis</button>
-                        <button class="demo-btn" onclick="downloadResearchAnalysis()">📥 Download Analysis</button>
-                        <a class="demo-btn" href="/proofs/benchmark_chart.png" target="_blank">📈 View Benchmark Chart</a>
+                        <button class="demo-btn" onclick="viewResearchPaper()">View Research Paper</button>
+                        <button class="demo-btn" onclick="downloadResearchPaper()">Download PDF</button>
+                        <button class="demo-btn" onclick="viewResearchAnalysis()">View Research Analysis</button>
+                        <button class="demo-btn" onclick="downloadResearchAnalysis()">Download Analysis</button>
+                        <a class="demo-btn" href="/proofs/benchmark_chart.png" target="_blank">View Benchmark Chart</a>
                     </div>
                     
                     <div class="demo-output" style="min-height: 150px;">
-                        <strong>📊 Comprehensive Technical Analysis Available!</strong><br><br>
+                        <strong>Comprehensive Technical Analysis Available!</strong><br><br>
                         <strong>Key Highlights:</strong><br>
                         • <strong>94.2% Overall System Efficiency</strong><br>
                         • <strong>25 Filtration Techniques</strong> across 6 layers<br>
@@ -548,7 +543,7 @@
                         </div>
 
                         <div style="flex:1 1 420px; min-width:280px; border:1px solid #333; border-radius:10px; overflow:hidden; background:#0b1220;">
-                            <div style="padding:10px 12px; border-bottom:1px solid #222; font-weight:600;">📈 Benchmark Chart (Live Proof)</div>
+                            <div style="padding:10px 12px; border-bottom:1px solid #222; font-weight:600;">Benchmark Chart (Live Proof)</div>
                             <div style="padding:10px;">
                                 <img src="/proofs/benchmark_chart.png" alt="Benchmark Chart" style="width:100%; height:auto; border-radius:8px; border:1px solid #222;" onerror="this.parentElement.innerHTML='Chart not found. Generate via scripts/collect_benchmark.py & scripts/plot_benchmark.py.'">
                                 <div style="margin-top:8px; color:#b8c6db; font-size:13px;">Source: <code>proofs/benchmark_results.json</code></div>
@@ -562,7 +557,7 @@
         <!-- Achievements Section -->
         <div id="achievements" class="content-section">
             <div class="section">
-                <h2>🚀 Key Achievements</h2>
+                <h2>Key Achievements</h2>
                 
                 <h3>1. Algorithmic Innovation</h3>
                 <ul>
@@ -590,7 +585,7 @@
         <!-- Mathematical Formulas Section -->
         <div id="formulas" class="content-section">
             <div class="section">
-                <h2>🧮 Mathematical Formulas & Proofs</h2>
+                <h2>Mathematical Formulas & Proofs</h2>
                 <p>Comprehensive mathematical analysis and formula visualizations demonstrating the sophisticated algorithms used in Mersenne prime discovery.</p>
                 
                 <div class="stats-grid">
@@ -614,7 +609,7 @@
             </div>
 
             <div class="section">
-                <h2>🚀 Exponential Growth Formula</h2>
+                <h2>Exponential Growth Formula</h2>
                 <p>The core prediction model for Mersenne prime exponents based on analysis of all 52 known exponents.</p>
                 
                 <div class="interactive-demo">
@@ -631,7 +626,7 @@
                     </div>
                     
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="viewFormulaProof('exponential_growth_formula_proof.png')">📊 View Formula Proof</button>
+                        <button class="demo-btn" onclick="viewFormulaProof('exponential_growth_formula_proof.png')">View Formula Proof</button>
                     </div>
                 </div>
             </div>
@@ -651,13 +646,13 @@
                     </div>
                     
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="viewFormulaProof('gap_analysis_formula_proof.png')">📈 View Gap Analysis</button>
+                        <button class="demo-btn" onclick="viewFormulaProof('gap_analysis_formula_proof.png')">View Gap Analysis</button>
                     </div>
                 </div>
             </div>
 
             <div class="section">
-                <h2>🎯 Candidate Filtering Formulas</h2>
+                <h2>Candidate Filtering Formulas</h2>
                 <p>Multi-layered mathematical filters to eliminate invalid candidates and improve discovery efficiency.</p>
                 
                 <div class="interactive-demo">
@@ -698,7 +693,7 @@
             </div>
 
             <div class="section">
-                <h2>🧮 Prime Number Theorem Integration</h2>
+                <h2>Prime Number Theorem Integration</h2>
                 <p>Integration with classical number theory for enhanced prime counting and gap estimation.</p>
                 
                 <div class="interactive-demo">
@@ -713,7 +708,7 @@
                     </div>
                     
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="viewFormulaProof('prime_number_theorem_formula_proof.png')">📊 View Number Theory</button>
+                        <button class="demo-btn" onclick="viewFormulaProof('prime_number_theorem_formula_proof.png')">View Number Theory</button>
                     </div>
                 </div>
             </div>
@@ -738,7 +733,7 @@
                     </div>
                     
                     <div class="demo-controls">
-                        <button class="demo-btn" onclick="viewFormulaProof('comprehensive_prediction_formula_proof.png')">🎯 View Complete Algorithm</button>
+                        <button class="demo-btn" onclick="viewFormulaProof('comprehensive_prediction_formula_proof.png')">View Complete Algorithm</button>
                     </div>
                 </div>
             </div>
@@ -774,7 +769,7 @@
             </div>
 
             <div class="section">
-                <h2>🚀 Optimal Search Strategy</h2>
+                <h2>Optimal Search Strategy</h2>
                 <ol>
                     <li><strong>Start with exponential predictions</strong> for range estimation</li>
                     <li><strong>Apply modulo 210 filtering</strong> to eliminate invalid candidates</li>
@@ -1023,7 +1018,7 @@
             }
 
             const statusDiv = document.getElementById('discovery-status');
-            statusDiv.innerHTML = '🚀 Starting revolutionary discovery...';
+            statusDiv.innerHTML = 'Starting revolutionary discovery...';
 
             try {
                 const response = await fetch('/api/start_discovery', {
@@ -1046,11 +1041,11 @@
                 discoveryRunning = true;
                 statusDiv.innerHTML = `
                     ✅ Discovery started successfully!<br>
-                    📊 Range: ${startRange.toLocaleString()} to ${endRange.toLocaleString()}<br>
-                    🎯 Max candidates: ${maxCandidates.toLocaleString()}<br>
-                    🧵 Workers: ${workers}<br>
-                    ⏰ Started: ${result.start_time}<br><br>
-                    <strong>🔄 Monitoring progress...</strong>
+                    Range: ${startRange.toLocaleString()} to ${endRange.toLocaleString()}<br>
+                    Max candidates: ${maxCandidates.toLocaleString()}<br>
+                    Workers: ${workers}<br>
+                    Started: ${result.start_time}<br><br>
+                    <strong>Monitoring progress...</strong>
                 `;
 
                 // Start monitoring progress
@@ -1086,18 +1081,18 @@
                     progressBar.style.width = progressPercent + '%';
 
                     let statusText = `
-                        <strong>🚀 Revolutionary Discovery Running</strong><br>
-                        ⏱️ Elapsed: ${elapsed}s<br>
-                        🔍 Candidates tested: ${status.candidates_tested.toLocaleString()}<br>
-                        📈 Test rate: ${rate} tests/second<br>
-                        🧵 Active threads: ${status.threads_active}<br>
-                        🏆 Discoveries: ${discoveries.length}<br><br>
+                        <strong>Revolutionary Discovery Running</strong><br>
+                        Elapsed: ${elapsed}s<br>
+                        Candidates tested: ${status.candidates_tested.toLocaleString()}<br>
+                        Test rate: ${rate} tests/second<br>
+                        Active threads: ${status.threads_active}<br>
+                        Discoveries: ${discoveries.length}<br><br>
                     `;
 
                     if (discoveries.length > 0) {
-                        statusText += '<strong>🌟 Recent Discoveries:</strong><br>';
+                        statusText += '<strong>Recent Discoveries:</strong><br>';
                         discoveries.slice(-3).forEach((disc, i) => {
-                            const verified = disc.verified_by_prime95 ? '✅ VERIFIED' : '⏳ PENDING';
+                            const verified = disc.verified_by_prime95 ? 'VERIFIED' : 'PENDING';
                             statusText += `  #${discoveries.length - discoveries.slice(-3).length + i + 1}: p = ${disc.exponent.toLocaleString()} (${disc.test_time.toFixed(4)}s) ${verified}<br>`;
                         });
                     }
@@ -1111,20 +1106,20 @@
 
                     const discoveries = status.discoveries || [];
                     let finalText = `
-                        <strong>🎉 Discovery Complete!</strong><br>
-                        ⏱️ Total time: ${Math.round(status.elapsed_time)}s<br>
-                        🔍 Candidates tested: ${status.candidates_tested.toLocaleString()}<br>
-                        🏆 Discoveries found: ${discoveries.length}<br><br>
+                        <strong>Discovery Complete!</strong><br>
+                        Total time: ${Math.round(status.elapsed_time)}s<br>
+                        Candidates tested: ${status.candidates_tested.toLocaleString()}<br>
+                        Discoveries found: ${discoveries.length}<br><br>
                     `;
 
                     if (discoveries.length > 0) {
                         const verified = discoveries.filter(d => d.verified_by_prime95).length;
-                        finalText += '<strong>🌟 All Discoveries:</strong><br>';
+                        finalText += '<strong>All Discoveries:</strong><br>';
                         discoveries.forEach((disc, i) => {
-                            const status = disc.verified_by_prime95 ? '✅ VERIFIED' : '⏳ PENDING';
+                            const status = disc.verified_by_prime95 ? 'VERIFIED' : 'PENDING';
                             finalText += `  #${i + 1}: p = ${disc.exponent.toLocaleString()} → 2^${disc.exponent} - 1 (${status})<br>`;
                         });
-                        finalText += `<br><strong>📊 Summary: ${verified}/${discoveries.length} verified by Prime95</strong>`;
+                        finalText += `<br><strong>Summary: ${verified}/${discoveries.length} verified by Prime95</strong>`;
                     } else {
                         finalText += '<em>No new Mersenne primes found in this range.</em><br>';
                         finalText += 'Try expanding the range or increasing candidate count.';
@@ -1199,11 +1194,11 @@
                 const candidates = result.candidates.slice(0, 20); // Show first 20
 
                 statusDiv.innerHTML = `
-                    <strong>🧠 Intelligent Candidates Generated!</strong><br>
-                    📊 Total candidates: ${result.count.toLocaleString()}<br>
-                    📏 Range: ${startRange.toLocaleString()} to ${endRange.toLocaleString()}<br>
-                    🎯 Density score: ${analysis.density_score.toFixed(3)}<br><br>
-                    <strong>📋 Sample candidates (first 20):</strong><br>
+                    <strong>Intelligent Candidates Generated!</strong><br>
+                    Total candidates: ${result.count.toLocaleString()}<br>
+                    Range: ${startRange.toLocaleString()} to ${endRange.toLocaleString()}<br>
+                    Density score: ${analysis.density_score.toFixed(3)}<br><br>
+                    <strong>Sample candidates (first 20):</strong><br>
                     ${candidates.map(c => c.toLocaleString()).join(', ')}<br><br>
                     <em>These candidates are generated using advanced pattern analysis of known Mersenne primes!</em>
                 `;
