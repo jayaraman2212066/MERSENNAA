@@ -316,15 +316,17 @@ def generate_pdf():
     story.append(Paragraph("16. Appendices", heading))
     story.append(Paragraph("Additional tables, raw benchmark JSON, configuration details, and extended charts.", body))
 
-    # Inflate with additional structured exposition to ensure 50+ pages
-    for i in range(1, 16):
-        story.append(Paragraph(f"Appendix A{i}: Extended Notes on Heuristics and Filters", subheading))
-        for _ in range(0, 18):
-            story.append(Paragraph(
-                "Extended elaboration: empirical behavior of residue classes, gap dispersion under log-scaling, and interactions between modulo-210 pruning and Miller–Rabin priming for exponent selection.",
-                body,
-            ))
-        story.append(PageBreak())
+    # Concise appendices: link to real assets without filler
+    appendix_rows = [["Asset", "Location/Notes"],
+                     ["Benchmark Chart", "proofs/benchmark_chart.png"],
+                     ["Benchmark JSON", "proofs/benchmark_results.json"],
+                     ["Analysis Charts", "pattern creation/analysis_full/charts/*.png"],
+                     ["Formulas Notes", "pattern creation/FORMULAS.md"],
+                     ["Web Templates", "templates/index.html (color schemes, UI)"],
+                     ["Infinity Models", "mersenne_prime_infinity_formula_proof.png, improved_*.png"],
+                     ["Prime Proof Generator", "generate_proof_png.py (GIMPS results parser)"],]
+    story.append(build_table(appendix_rows, col_widths=[220, 340]))
+    story.append(PageBreak())
 
     doc.build(story)
     print("research_analysis.pdf generated (comprehensive)")
