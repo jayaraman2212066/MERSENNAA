@@ -31,6 +31,7 @@ class MersenneFormulaVisualizer:
         
         # Calculate derived values
         self.log_exponents = [math.log(p) for p in self.known_exponents]
+        self.log10_exponents = [math.log10(p) for p in self.known_exponents]
         self.x_values = list(range(1, len(self.known_exponents) + 1))
         
         # Calculate exponential regression parameters
@@ -603,6 +604,71 @@ class MersenneFormulaVisualizer:
         ss_tot = sum((y_actual - y_mean)**2 for y_actual in self.known_exponents)
         
         return 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
+
+    def create_exponent_fit_validation(self, exclude_prefix:int = 8) -> str:
+        """Validate model by fitting log10(p) vs index on tail and comparing to actual p."""
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        n_total = len(self.known_exponents)
+        indices = np.arange(1, n_total + 1)
+        log10_p = np.array(self.log10_exponents)
+
+        # Exclude early small-n region from fit
+        fit_start = min(max(1, exclude_prefix + 1), n_total)
+        x_fit = indices[fit_start-1:]
+        y_fit = log10_p[fit_start-1:]
+
+        # Linear regression y = m x + b on log10(p)
+        A = np.vstack([x_fit, np.ones_like(x_fit)]).T
+        m, b = np.linalg.lstsq(A, y_fit, rcond=None)[0]
+
+        # Predictions
+        y_hat_log10 = m * indices + b
+        p_hat = 10 ** y_hat_log10
+        p_true = np.array(self.known_exponents, dtype=float)
+
+        # Errors (report only on tail used for validation)
+        tail_mask = indices >= fit_start
+        mae = np.mean(np.abs(p_hat[tail_mask] - p_true[tail_mask]))
+        mape = np.mean(np.abs((p_hat[tail_mask] - p_true[tail_mask]) / p_true[tail_mask])) * 100.0
+
+        # Plot
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
+
+        ax1.set_title('Exponent vs Index (with Tail Fit on log10 p)')
+        ax1.scatter(indices, p_true, c='red', s=40, label='Actual p(n)')
+        ax1.plot(indices, p_hat, 'b-', lw=2, label=f"Fit: p̂(n)=10^({m:.4f} n + {b:.4f})")
+        ax1.set_yscale('log')
+        ax1.set_xlabel('Index n')
+        ax1.set_ylabel('Exponent p')
+        ax1.legend()
+        ax1.grid(alpha=0.3)
+
+        ax2.set_title('Validation on Tail (n ≥ {})'.format(fit_start))
+        ratio = p_hat / p_true
+        ax2.plot(indices, ratio, 'g-', lw=2, label='p̂(n) / p(n)')
+        ax2.axhline(1.0, color='black', ls='--', lw=1)
+        ax2.set_xlabel('Index n')
+        ax2.set_ylabel('Ratio')
+        ax2.legend()
+        ax2.grid(alpha=0.3)
+
+        # Text box with metrics
+        text = (
+            f"Fit domain: n ≥ {fit_start}\n"
+            f"Model: log10 p ≈ {m:.6f} n + {b:.6f}\n"
+            f"MAE (tail): {mae:,.0f}\n"
+            f"MAPE (tail): {mape:.3f}%\n"
+        )
+        ax2.text(0.02, 0.98, text, transform=ax2.transAxes, va='top',
+                 bbox=dict(boxstyle='round,pad=0.4', facecolor='white', alpha=0.8))
+
+        plt.tight_layout()
+        out = 'exponent_fit_validation.png'
+        plt.savefig(out, dpi=300, bbox_inches='tight')
+        plt.close()
+        return out
     
     def generate_all_formula_proofs(self) -> List[str]:
         """Generate all formula proof visualizations"""
@@ -624,6 +690,9 @@ class MersenneFormulaVisualizer:
         print(f"✅ Created: {files[-1]}")
         
         files.append(self.create_comprehensive_prediction_formula())
+        print(f"✅ Created: {files[-1]}")
+
+        files.append(self.create_exponent_fit_validation())
         print(f"✅ Created: {files[-1]}")
         
         print(f"\n🎉 All formula proofs generated successfully!")

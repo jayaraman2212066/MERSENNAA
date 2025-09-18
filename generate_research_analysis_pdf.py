@@ -116,6 +116,9 @@ def generate_pdf():
         'improved_mersenne_prime_infinity_formula_proof.png',
     ]
     formula_imgs = [p for p in formula_imgs if os.path.exists(p)]
+    # Add validation plot if generated
+    if os.path.exists('exponent_fit_validation.png'):
+        formula_imgs.append('exponent_fit_validation.png')
 
     # Analysis charts
     charts_dir = os.path.join('pattern creation', 'analysis_full', 'charts')
