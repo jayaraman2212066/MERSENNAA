@@ -10,7 +10,6 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from datetime import datetime
 import os
 
 
@@ -28,16 +27,14 @@ def create_analysis_pdf():
 	body_style = ParagraphStyle('CustomBody', parent=styles['Normal'], fontSize=11, spaceAfter=6, alignment=TA_LEFT)
 	
 	story = []
-	story.append(Paragraph("🚀 MERSENNE PROJECT: COMPREHENSIVE TECHNICAL ANALYSIS", title_style))
+	story.append(Paragraph("MERSENNE PROJECT: COMPREHENSIVE TECHNICAL ANALYSIS", title_style))
 	story.append(Spacer(1, 20))
 	story.append(Paragraph("Revolutionary Mathematical Discovery System", heading_style))
 	story.append(Spacer(1, 20))
-	story.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", body_style))
-	story.append(Spacer(1, 20))
-	story.append(Paragraph("Executive Summary: 94.2% Efficient Mersenne Prime Discovery System", body_style))
+	story.append(Paragraph("Executive Summary", body_style))
 	story.append(PageBreak())
 	
-	story.append(Paragraph("📋 TABLE OF CONTENTS", heading_style))
+	story.append(Paragraph("TABLE OF CONTENTS", heading_style))
 	for item in [
 		"1. Executive Summary",
 		"2. Data Workflow Analysis",
@@ -53,10 +50,7 @@ def create_analysis_pdf():
 		story.append(Paragraph(item, body_style))
 	story.append(PageBreak())
 
-	# Timestamp header
-	ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")
-	story.append(Paragraph(f"Generated on: {ts}", body_style))
-	story.append(Spacer(1, 12))
+	# Remove timestamps for a clean, human-authored look
 
 	# Minimal core to keep the PDF short here, we primarily add the benchmark proof section
 	story.append(Paragraph("1. System Overview", heading_style))

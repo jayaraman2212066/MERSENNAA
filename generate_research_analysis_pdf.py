@@ -27,7 +27,6 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from datetime import datetime
 import os, json
 
 
@@ -133,8 +132,7 @@ def generate_pdf():
     story = []
     # Title
     story.append(Paragraph("MERSENNE: Advanced Mathematical Computing Project", title_style))
-    story.append(Paragraph("Deep Research Compendium (Comprehensive 50+ Pages)", subtitle_style))
-    story.append(Paragraph(f"Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", body))
+    story.append(Paragraph("Research Compendium", subtitle_style))
     story.append(Spacer(1, 12))
 
     # Abstract
@@ -218,9 +216,9 @@ def generate_pdf():
         story.append(PageBreak())
 
     # Infinity Exponent Models
-    story.append(Paragraph("6. Infinity Exponent Models", heading))
+    story.append(Paragraph("6. Exponent Progression Models", heading))
     story.append(Paragraph(
-        "We present empirical infinity-oriented models for the nth Mersenne exponent p(n), e.g., p(n) ≈ 10^(0.2483n + 6.0976) + 0.1 n^1.5, with visual validations included.",
+        "We present empirical models for the nth Mersenne exponent p(n), e.g., p(n) ≈ 10^(0.2483n + 6.0976) + 0.1 n^1.5, with visual validations included.",
         body,
     ))
     story.append(PageBreak())
