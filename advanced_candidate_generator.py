@@ -329,14 +329,18 @@ class AdvancedCandidateGenerator:
         # Remove duplicates and sort
         unique_candidates = sorted(list(set(all_candidates)))
         
-        # If we don't have enough, fill with random candidates
+        # If we don't have enough, fill with PRIME-VALID candidates only
         if len(unique_candidates) < count:
-            remaining = count - len(unique_candidates)
             import random
             random.seed(42)
-            for _ in range(remaining):
+            attempts = 0
+            # Safety cap to avoid long loops if range is tight
+            max_attempts = max(10000, (count - len(unique_candidates)) * 50)
+            while len(unique_candidates) < count and attempts < max_attempts:
                 candidate = random.randint(start, end)
-                if candidate not in unique_candidates:
+                attempts += 1
+                if (candidate not in unique_candidates and 
+                    self.is_valid_mersenne_exponent_candidate(candidate)):
                     unique_candidates.append(candidate)
         
         # Sort and limit
