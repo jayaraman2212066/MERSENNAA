@@ -1,55 +1,53 @@
-﻿# OS
-.DS_Store
-Thumbs.db
-
-# Editors/IDE
-.vscode/
-.idea/
-*.code-workspace
-
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.egg-info/
-.venv/
-venv/
-.env
-.env.*
-.mypy_cache/
-.pytest_cache/
-
-# C/C++ build artifacts
-build/
-cmake-build*/
-*.o
-*.obj
-*.exe
-*.dll
-*.lib
+*$py.class
 *.so
-*.dylib
-*.a
-*.lo
-*.la
-*.out
-*.pdb
-*.ilk
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Logs and temp
-*.log
-*.tmp
-*.temp
-*.cache/
+# Virtual environments
+venv/
+env/
+ENV/
 
-# Coverage
-.coverage
-htmlcov/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Misc
+# IDE
+.vscode/
+.idea/
 *.swp
 *.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local config
+.env
+config.local.json
+
+# Compiled C++
+*.exe
+*.obj
+*.o
+*.dll
+
+# Temporary files
+*.tmp
+*.temp
