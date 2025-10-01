@@ -13,7 +13,6 @@ WORKDIR /app
 
 # Copy C++ source files
 COPY *.cpp ./
-COPY "finder_new_mersenne prim/"*.cpp ./
 
 # Compile C++ executables
 RUN g++ -std=c++17 -O2 -pthread -DUSE_GMP \
