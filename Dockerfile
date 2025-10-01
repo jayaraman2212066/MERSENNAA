@@ -1,62 +1,21 @@
-# Multi-stage build for C++ and Python hybrid system
-FROM ubuntu:22.04 as cpp-builder
-
-# Install C++ build dependencies
-RUN apt-get update && apt-get install -y \
-    g++ \
-    make \
-    libgmp-dev \
-    libgmpxx4ldbl \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /app
-
-# Copy C++ source files
-COPY *.cpp ./
-
-# Compile C++ executables
-RUN g++ -std=c++17 -O2 -pthread -DUSE_GMP \
-    complete_cpp_mersenne_system.cpp \
-    -lgmp -lgmpxx \
-    -o mersenne_system
-
-RUN g++ -std=c++17 -O2 -pthread \
-    optimal_mersenne_engine.cpp \
-    -o optimal_mersenne_engine
-
-RUN g++ -std=c++17 -O2 -pthread \
-    independent_mersenne_engine.cpp \
-    -o independent_mersenne_engine
-
-# Python runtime stage
+# Simple Python-only deployment
 FROM python:3.11-slim
 
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    libgmp10 \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
-# Copy Python requirements and install
+# Copy and install requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy Python application
+# Copy application files
 COPY app.py .
-COPY cpp_bridge.py .
+
+# Copy directories that exist
 COPY templates/ templates/
 COPY archived_png_files/ archived_png_files/
-COPY *.pdf ./
-COPY proofs/ proofs/
 
-# Copy compiled C++ executables from builder stage
-COPY --from=cpp-builder /app/mersenne_system .
-COPY --from=cpp-builder /app/optimal_mersenne_engine .
-COPY --from=cpp-builder /app/independent_mersenne_engine .
-
-# Make executables runnable
-RUN chmod +x mersenne_system optimal_mersenne_engine independent_mersenne_engine
+# Copy PDFs if they exist
+COPY *.pdf ./ || true
 
 # Expose port
 EXPOSE 10000
