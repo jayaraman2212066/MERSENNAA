@@ -5,7 +5,8 @@ import time
 import os
 from datetime import datetime
 
-app = Flask(__name__)
+# Ensure Flask can find templates
+app = Flask(__name__, template_folder='templates', static_folder='archived_png_files')
 
 class MersenneCalculator:
     def __init__(self):
