@@ -16,6 +16,7 @@ Same time complexity as Prime95 with GMP integration
 #include <algorithm>
 #include <cmath>
 #include <random>
+#include <cstdlib>
 
 #ifdef USE_GMP
 #include <gmp.h>
@@ -467,9 +468,16 @@ int main() {
     cout << "✅ System: Pure C++ only" << endl;
     cout << "========================================" << endl;
     
+    // Get port from environment variable (for Render deployment)
+    int port = 8080;
+    const char* port_env = getenv("PORT");
+    if (port_env) {
+        port = atoi(port_env);
+    }
+    
     try {
         MersenneDiscoveryEngine engine;
-        HTTPServer server(&engine, 8080);
+        HTTPServer server(&engine, port);
         
         cout << "🔧 Starting discovery engine..." << endl;
         

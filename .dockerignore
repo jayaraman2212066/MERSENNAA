@@ -1,0 +1,17 @@
+# Ignore unnecessary files for Docker build
+deprecated_python_files/
+archived_png_files/
+*.exe
+*.pdf
+*.md
+*.bat
+*.txt
+.git/
+.gitignore
+proofs/
+assets/
+templates/
+scripts/
+pattern creation/
+finder_new_mersenne prim/
+all perfectno about/
