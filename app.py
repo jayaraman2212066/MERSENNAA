@@ -8,6 +8,17 @@ from datetime import datetime
 # Ensure Flask can find templates
 app = Flask(__name__, template_folder='templates', static_folder='archived_png_files')
 
+# Check for C++ executables
+def check_cpp_executables():
+    executables = ['mersenne_system', 'optimal_mersenne_engine', 'independent_mersenne_engine']
+    available = []
+    for exe in executables:
+        if os.path.exists(exe) and os.access(exe, os.X_OK):
+            available.append(exe)
+    return available
+
+cpp_executables = check_cpp_executables()
+
 class MersenneCalculator:
     def __init__(self):
         self.known_mersenne_primes = [
@@ -126,6 +137,7 @@ def index():
             <h2>🔗 Resources</h2>
             <p><strong>GitHub:</strong> <a href="https://github.com/jayaraman2212066/MERSENNAA" style="color: #00ffff;">https://github.com/jayaraman2212066/MERSENNAA</a></p>
             <p><strong>Research Paper:</strong> <a href="/research_analysis.pdf" style="color: #00ffff;">Download PDF</a></p>
+            <p><strong>C++ Status:</strong> <span id="cpp-status">Checking...</span></p>
             <p><em>Template Error: {str(e)}</em></p>
         </div>
     </div>
@@ -310,10 +322,21 @@ def run_analysis():
         return jsonify({
             "analysis_time": round(end_time - start_time, 4),
             "patterns": patterns,
+            "cpp_executables": cpp_executables,
+            "cpp_available": len(cpp_executables) > 0,
             "timestamp": datetime.now().isoformat()
         })
     except Exception as e:
         return jsonify({"error": str(e)})
+
+@app.route('/api/cpp_status')
+def cpp_status():
+    """Check C++ executable status"""
+    return jsonify({
+        "executables": cpp_executables,
+        "available": len(cpp_executables) > 0,
+        "count": len(cpp_executables)
+    })
 
 @app.route('/research_analysis.pdf')
 def research_analysis():

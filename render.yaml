@@ -1,15 +1,15 @@
 services:
   - type: web
-    name: mersenne-cpp-system
+    name: mersenne-system
     env: docker
     dockerfilePath: ./Dockerfile
-    plan: free
-    region: oregon
-    branch: main
+    plan: starter
     buildCommand: ""
-    startCommand: "./mersenne_system"
+    startCommand: "python app.py"
     envVars:
       - key: PORT
-        value: 8080
+        value: 10000
+      - key: PYTHONUNBUFFERED
+        value: 1
     healthCheckPath: /
     autoDeploy: true
