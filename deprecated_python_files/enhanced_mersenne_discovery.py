@@ -348,7 +348,7 @@ class EnhancedMersenneDiscovery:
             discovery = {
                 "exponent": candidate,
                 "mersenne_number": str((1 << candidate) - 1),
-                "digits": candidate,
+                "digits": candidate * 0.30103,  # log10(2) * p approximation
                 "discovery_time": datetime.now().isoformat(),
                 "test_time": test_time,
                 "method": "Lucas-Lehmer",
@@ -468,10 +468,13 @@ class EnhancedMersenneDiscovery:
                 elapsed = time.time() - self.start_time
                 rate = self.candidates_tested / elapsed if elapsed > 0 else 0
                 
-                print(f"\r📊 Progress: {self.candidates_tested:,}/{len(candidates)} | "
-                      f"Rate: {rate:.1f}/s | "
-                      f"Discoveries: {len(self.discoveries)} | "
-                      f"Elapsed: {elapsed:.1f}s", end="", flush=True)
+                progress_pct = (self.candidates_tested / len(candidates)) * 100
+                eta = (len(candidates) - self.candidates_tested) / rate if rate > 0 else 0
+                current_time = datetime.now().strftime("%H:%M:%S")
+                
+                print(f"\r🕐 {current_time} | 📊 {progress_pct:.1f}% ({self.candidates_tested:,}/{len(candidates)}) | "
+                      f"⚡ {rate:.1f}/s | 🎯 {len(self.discoveries)} found | "
+                      f"⏱️ {elapsed:.0f}s | ETA: {eta:.0f}s", end="", flush=True)
                 
                 # Small delay to prevent overwhelming the system
                 time.sleep(0.1)

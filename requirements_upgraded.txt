@@ -1,0 +1,14 @@
+# Upgraded Lucas-Lehmer Test Requirements
+gmpy2>=2.1.0          # High-performance arbitrary precision arithmetic
+numpy>=1.21.0         # Numerical computing
+psutil>=5.8.0         # System and process utilities
+sympy>=1.9            # Symbolic mathematics (optional, for additional number theory)
+
+# Optional performance libraries
+numba>=0.56.0         # JIT compilation for numerical functions
+cython>=0.29.0        # C extensions for Python (if building from source)
+
+# Development and testing
+pytest>=6.0.0         # Testing framework
+pytest-benchmark>=3.4.0  # Performance benchmarking
+memory-profiler>=0.60.0  # Memory usage profiling
